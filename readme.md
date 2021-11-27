@@ -26,7 +26,8 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
     - [ ] Max transfer
     - [ ] Marketing wallet
 - [ ] Link to bloXroute
-- [ ] Comment bot.js
+- [x] Comment buy.js
+- [x] Comment sendTx.js
 - [ ] Develop frontend
 - [ ] Create script to fill wallets
 - [x] Rename the scripts

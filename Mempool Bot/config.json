@@ -12,7 +12,6 @@
     "wBNB" : "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
     "sellGasLimit" : "10000000",
     "sellGasPrice" : "15000000000",
-    "tries" : "0",
     "multiplier" : "2",
     "percentToSell" : "50",
     "blockDelay" : "0",

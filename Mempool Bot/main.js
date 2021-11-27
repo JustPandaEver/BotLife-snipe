@@ -86,7 +86,6 @@ const startConnection = () => {
         approveToken(toSnipe) 
 
         let amountOut = config["expectedAmountOut"]
-        let tries = config["tries"]
         let multiplier = config["multiplier"]
         let percent = config["percentToSell"]
         let amountIn = myArgs[7]
@@ -97,7 +96,7 @@ const startConnection = () => {
                     switch (snipeType) { // Use the snipe type we select
                         case 'dxsale':
                             if (reDX.test(tx.data)) { // Search the mempool for the selected method
-                                spamBot(toSnipe, amountOut, tries, tx, blockDelay) // Buy the token and pass on the transaction
+                                spamBot(toSnipe, amountOut, tx, blockDelay) // Buy the token and pass on the transaction
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
@@ -111,7 +110,7 @@ const startConnection = () => {
                                             value: tx.value,
                                         })
                                     if (toSnipe === decodedInput.args[0]) {
-                                        spamBot(toSnipe, amountOut, tries, tx, blockDelay)
+                                        spamBot(toSnipe, amountOut, tx, blockDelay)
                                         sell(toSnipe, multiplier, percent, amountIn)
                                     }
                                 }
@@ -125,7 +124,7 @@ const startConnection = () => {
                                 re6.test(tx.data) ||
                                 re7.test(tx.data)
                             ) {
-                                spamBot(toSnipe, amountOut, tries, tx, blockDelay)
+                                spamBot(toSnipe, amountOut, tx, blockDelay)
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
@@ -133,14 +132,14 @@ const startConnection = () => {
                         case 'enabletrading':
                             if (trading1.test(tx.data)) {
                                 if (tx.to === toSnipe) {
-                                    spamBot(toSnipe, amountOut, tries, tx, blockDelay)
+                                    spamBot(toSnipe, amountOut, tx, blockDelay)
                                     sell(toSnipe, multiplier, percent, amountIn)
                                 }
                             }
                             break
                         case 'pinksale':
                             if (re8.test(tx.data)) {
-                                spamBot(toSnipe, amountOut, tries, tx, blockDelay)
+                                spamBot(toSnipe, amountOut, tx, blockDelay)
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break

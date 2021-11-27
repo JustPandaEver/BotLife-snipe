@@ -1,18 +1,13 @@
 
-const { ethers, BigNumber } = require('ethers')
+const { ethers } = require('ethers')
 
 async function sendTransaction(providerInfo) {
     try {
-        const signer = new ethers.Wallet(
+        const signer = new ethers.Wallet( // Create our signer
             providerInfo.acct,
             providerInfo.provider
         )
-        await signer.sendTransaction(providerInfo.tx)
-        const balance = await providerInfo.provider.getBalance(providerInfo.contract)
-        if (balance.eq(BigNumber(0))) {
-            return true
-        }
-        return false
+        await signer.sendTransaction(providerInfo.tx) // Send the transaction to the network
     } catch (error) {
         console.log('Exception occurred in sendTransaction')
     }
