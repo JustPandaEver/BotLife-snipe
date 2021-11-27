@@ -22,7 +22,7 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 - [ ] Link to bloXroute
 - [ ] Develop frontend
 - [ ] Create script to fill wallets
-- [ ] Buy with balance in contract
+- [x] Buy with balance in contract
 - [ ] Test the bot
 - [ ] Rewrite in GoLang
 - [ ] Develop limit buy/sell

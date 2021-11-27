@@ -14,7 +14,6 @@ const config = require('./config.json')
 
 ////////////////CONFIG/////////////////////////
 let smartContract = config["botContract"]
-let txValue = 1
 let buyTxGasPrice = config["buyTxGasPrice"] // do these need to be converted to numbers
 let buyGasLimit = config["buyGasLimit"]
 const provider = new ethers.providers.JsonRpcProvider( //Json or WebSocket
@@ -124,7 +123,8 @@ module.exports = async function startBot(target, amountOut, tx, blockDelay) {
         const buyBlock = receiptLP.blockNumber + (blockDelay - 2) // What block to buy on. Why - 2?
         // eslint-disable-next-line no-empty
         while ((await provider.getBlockNumber()) < buyBlock) {}
-    } 
+    }
+    let txValue = await provider.getBalance(config["botContract"])
     // eslint-disable-next-line no-constant-condition
         for (i in acctInfo) { // Buy with each wallet
             let tx = { // Create the transaction
@@ -142,8 +142,7 @@ module.exports = async function startBot(target, amountOut, tx, blockDelay) {
             let providerInfo = { // Set the info the child process needs
                 tx: signedTx,
                 acct: acctInfo[i]['Skey'],
-                contract: smartContract,
-                provider: provider,
+                provider: provider
             }
             sendTx.send(providerInfo) // Send the info
             sendTx.on('message', () => {})

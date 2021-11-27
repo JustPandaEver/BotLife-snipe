@@ -1,13 +1,12 @@
 #!/usr/bin/env -S node --max-old-space-size=100000
 /* eslint-disable no-empty */
-//inputs (args) --> amountIn
+//inputs --> config.json
 
 
 ////////////////IMPORTS//////////////////// 
 'use strict'
 const { exec } = require('child_process')
 // eslint-disable-next-line no-undef
-var myArgs = process.argv.slice(2)
 const ethers = require('ethers')
 const spamBot = require('./buy.js')
 const approveToken = require('./approve.js')
@@ -87,8 +86,8 @@ const startConnection = () => {
 
         let amountOut = config["expectedAmountOut"]
         let multiplier = config["multiplier"]
-        let percent = config["percentToSell"]
-        let amountIn = myArgs[7]
+        let percent = config["percentToSell"];
+        let amountIn = await provider.getBalance(config["botContract"]) // Why unexpected token
         let blockDelay = config["blockDelay"]
         provider.on('pending', async (txHash) => { // Look through the mempool
             provider.getTransaction(txHash).then(async (tx) => { // Get the transaction from the hash

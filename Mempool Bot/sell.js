@@ -1,4 +1,4 @@
-// inputs --> target, multiplier, percent
+// inputs --> target, multiplier, percent, amountIn
 /* eslint-disable no-empty */
 const ethers = require('ethers')
 const config = require('./config.json')
@@ -75,8 +75,8 @@ module.exports = async function sell(target, multiplier, percent, amountIn) {
             balance,
             [toSnipe, wBNB]
         )
-        let goal = amountIn * 1e18 * multiplier
-        if (amountOut >= goal) {
+        let goal = amountIn.mul(1e18).mul(multiplier)
+        if (amountOut.gt(goal)) {
             await tradeTokensForExactETHWithSupportingFee(toSnipe, balance, percent)
         }
     }
