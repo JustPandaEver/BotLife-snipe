@@ -13,9 +13,6 @@ const spamBot = require('./buy.js')
 const approveToken = require('./approve.js')
 const sell = require('./sell.js')
 const config = require('./config.json')
-//const yargs = require('yargs/yargs')
-//const { hideBin } = require('yargs/helpers')
-//const argv = yargs(hideBin(process.argv)).argv
 //Object.assign(process.env, env)
 //const env = require('./conf/env.json')
 ///////////////////////////////////////////
@@ -27,9 +24,6 @@ const toSnipe = ethers.utils.getAddress(config["target"])
 const snipeType = config["snipeType"]
 const PCSRouter = config["PCSRouter"]
 const pcsAbi = new ethers.utils.Interface(require('./conf/abi.json'))
-//const blockDelay = parseInt(String(myArgs[2]))
-//const contractAdd = ethers.utils.getAddress('0xFDFb632bE900583a0fBa25b72cE6A6763a70Fbe8')
-//const snipeData = '0xf088d547' + ethers.utils.hexZeroPad(toSnipe, 32).replace('0x', '')
 ///////////////////////////////////////////
 
 

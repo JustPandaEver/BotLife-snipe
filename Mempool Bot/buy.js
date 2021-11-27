@@ -3,7 +3,6 @@
 const { ethers } = require('ethers')
 const axios = require('axios').default
 var _ = require('lodash')
-//var argv = require('minimist')(process.argv.slice(2))
 const { rjust } = require('justify-text')
 let keys = require('./keys.js')
 const ethUtils = require('ethereumjs-util')
