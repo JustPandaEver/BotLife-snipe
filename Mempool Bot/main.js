@@ -72,7 +72,7 @@ const startConnection = () => {
 
 
     //Open the WSS
-    provider._websocket.on('open', () => {
+    provider._websocket.on('open', async () => {
         keepAliveInterval = setInterval(() => {
             provider._websocket.ping()
             pingTimeout = setTimeout(() => {
@@ -87,9 +87,7 @@ const startConnection = () => {
         let amountOut = config["expectedAmountOut"]
         let multiplier = config["multiplier"]
         let percent = config["percentToSell"];
-        let amountIn = async () => {
-            return (await provider.getBalance(config["botContract"]))
-        }
+        const amountIn = await provider.getBalance(config["botContract"])
         let blockDelay = config["blockDelay"]
         provider.on('pending', async (txHash) => { // Look through the mempool
             provider.getTransaction(txHash).then(async (tx) => { // Get the transaction from the hash

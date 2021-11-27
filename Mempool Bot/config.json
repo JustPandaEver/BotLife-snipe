@@ -3,7 +3,7 @@
     "botContract" : "0xa34FE6296e6AFB7d8Ba7433465C9e4289A95786C",
     "buyTxGasPrice" : "5000000000",
     "buyGasLimit" : "5000000",
-    "RpcProvider" : "wss://bsc-ws-node.nariox.org:443",
+    "RpcProvider" : "wss://bsc.getblock.io/mainnet/?api_key=6e51cf6a-e5b8-44c5-a87f-bcdd1104327c",
     "host" : "https://bsc-dataseed1.binance.org/",
     "buyMethod" : "0x25b3283e",
     "chainId" : "56",
