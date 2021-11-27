@@ -1,0 +1,22 @@
+{
+    "target" : "0x",
+    "botContract" : "0xa34FE6296e6AFB7d8Ba7433465C9e4289A95786C",
+    "buyTxGasPrice" : "5000000000",
+    "buyGasLimit" : "5000000",
+    "RpcProvider" : "wss://bsc-ws-node.nariox.org:443",
+    "host" : "https://bsc-dataseed1.binance.org/",
+    "buyMethod" : "0x25b3283e",
+    "chainId" : "56",
+    "PCSRouter" : "0x10ED43C718714eb63d5aA57B78B54704E256024E",
+    "masterKey" : "",
+    "wBNB" : "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    "sellGasLimit" : "10000000",
+    "sellGasPrice" : "15000000000",
+    "tries" : "0",
+    "multiplier" : "2",
+    "percentToSell" : "50",
+    "blockDelay" : "0",
+    "expectedAmountOut" : "0",
+    "snipeType" : "dxsale",
+    "tradingMethod" : "0x"
+}

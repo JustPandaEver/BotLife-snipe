@@ -1,11 +1,12 @@
 /* eslint-disable no-empty */
 // inputs --> target
 const ethers = require('ethers')
+const config = require('./config.json')
 
 const walletBot = new ethers.Wallet(masterKey, provider)
-const masterKey = ''
-const provider = new ethers.providers.WebSocketProvider('ws://localhost:8546')
-const PCSRouter = '0x10ED43C718714eb63d5aA57B78B54704E256024E'
+const masterKey = config["masterKey"]
+const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
+const PCSRouter = config["PCSRouter"]
 
 
 

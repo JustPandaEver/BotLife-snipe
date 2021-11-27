@@ -8,20 +8,21 @@ const { rjust } = require('justify-text')
 let keys = require('./keys.js')
 const ethUtils = require('ethereumjs-util')
 const { fork } = require('child_process')
+const config = require('./config.json')
 
-let smartContract = '0xa34FE6296e6AFB7d8Ba7433465C9e4289A95786C'
+let smartContract = config["botContract"]
 let txValue = 1
-let txGasPrice = 5000000000
-let gasLimit = 5000000
+let buyTxGasPrice = config["buyTxGasPrice"] // do these need to be converted to numbers
+let buyGasLimit = config["buyGasLimit"]
 
-const provider = new ethers.providers.JsonRpcProvider(
-    'wss://bsc-ws-node.nariox.org:443'
+const provider = new ethers.providers.JsonRpcProvider( //Json or WebSocket
+    config["RpcProvider"]
 )
-let host = 'https://bsc-dataseed1.binance.org/'
+let host = config["host"]
 
 
 function txMethodId(target, amountOut) {
-    let method = '0x25b3283e' +
+    let method = config['buyMethod'] +
     rjust(target.replace('0x', ''), 64, '0') +
     rjust(parseInt(amountOut).toString(16).replace('x', ''), 64, '0') +
     rjust(1, 64, '0');
@@ -116,9 +117,9 @@ module.exports = async function startBot(target, amountOut, tries, tx, blockDela
             let tx = {
                 value: txValue,
                 nonce: acctInfo[i]['Nonce'],
-                gasPrice: txGasPrice,
-                gasLimit: gasLimit,
-                chainId: 56,
+                gasPrice: buyTxGasPrice,
+                gasLimit: buyGasLimit,
+                chainId: config["chainId"],
                 to: smartContract,
                 data: methodData,
             }

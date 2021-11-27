@@ -1,18 +1,19 @@
 // inputs --> target, multiplier, percent
 /* eslint-disable no-empty */
 const ethers = require('ethers')
+const config = require('./config.json')
 
 //const account = new ethers.Wallet(process.env.MNEMONIC, provider);
 const walletBot = new ethers.Wallet(masterKey, provider)
-const provider = new ethers.providers.WebSocketProvider('ws://localhost:8546')
-const PCSRouter = '0x10ED43C718714eb63d5aA57B78B54704E256024E'
-const wBNB = '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
+const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
+const PCSRouter = config["PCSRouter"]
+const wBNB = config["wBNB"]
 const pcsAbi = new ethers.utils.Interface(require('./conf/abi.json'))
 const router = new ethers.Contract(PCSRouter, pcsAbi, walletBot)
-const masterKey = ''
+const masterKey = config["masterKey"]
 
 
-///////////////FIND BALANCE////////////////// --> Find how many tokens we received and sell
+///////////////FIND BALANCE////////////////// --> Find how many tokens we received
 async function getTokenBalance(sellContract) {
     return (await sellContract.balanceOf(walletBot.address))
 }
@@ -28,6 +29,8 @@ async function tradeTokensForExactETHWithSupportingFee(
         console.log(`Selling Token: ${tokenToSell}`)
         const amountOutMin = ethers.BigNumber.from(0)
         let a = ethers.BigNumber.from(bigNumberToSell)
+        let sellGasLimit = config["sellGasLimit"]
+        let sellGasPrice = config["sellGasPrice"]
         const tx = // --> Create the transaction
             await router.swapExactTokensForETHSupportingFeeOnTransferTokens(
                 a.mul(percent).div(100), // Amount of tokens to sell
@@ -36,8 +39,8 @@ async function tradeTokensForExactETHWithSupportingFee(
                 walletBot.address, // To
                 Date.now() + 1000 * 60 * 10, // Deadline --> 10 minutes
                 {
-                    gasLimit: 10000000,
-                    gasPrice: 15000000000,
+                    gasLimit: sellGasLimit,
+                    gasPrice: sellGasPrice,
                 }
             )
         const receipt = await tx.wait() // --> Get the transaction hash

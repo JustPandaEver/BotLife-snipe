@@ -30,6 +30,7 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 - [ ] Develop frontend
 - [ ] Create script to fill wallets
 - [x] Rename the scripts
-- [ ] Create config file
+- [x] Create config file
+- [ ] Buy with balance in contract
 
 Cancel transactions that didn't succeed?
