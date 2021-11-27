@@ -1,8 +1,7 @@
-/* eslint-disable no-undef */
 const { ethers } = require('ethers')
 const axios = require('axios').default
 var _ = require('lodash')
-var argv = require('minimist')(process.argv.slice(2))
+//var argv = require('minimist')(process.argv.slice(2))
 const { rjust } = require('justify-text')
 let keys = require('./keys.js')
 const ethUtils = require('ethereumjs-util')
@@ -20,26 +19,22 @@ const provider = new ethers.providers.JsonRpcProvider(
 )
 let host = 'https://bsc-dataseed1.binance.org/'
 
-let txMethodId
-if (argv.method == 'buy') {
-    txMethodId =
-        '0xf088d547000000000000000000000000' + argv.target.replace('0x', '')
-}
-if (argv.method == 'buy2') {
-    txMethodId =
-        '0x25b3283e' +
-        rjust(argv.target.replace('0x', ''), 64, '0') +
-        rjust(parseInt(argv.amountOut).toString(16).replace('x', ''), 64, '0') +
-        rjust(argv.tries, 64, '0')
-}
 
+function txMethodId(target, amountOut) {
+    let method = '0x25b3283e' +
+    rjust(target.replace('0x', ''), 64, '0') +
+    rjust(parseInt(amountOut).toString(16).replace('x', ''), 64, '0') +
+    rjust(1, 64, '0');
+    return method;
+}
+// What is all this nonce stuff? Is it necessary? Can we just start at 1 and increase
 async function getNonces(acctInfo) {
     let noncePayloadList = []
     let nonceFetchId = 1
     let mapping = {}
 
     for (i in acctInfo) {
-        staticAddress = acctInfo[i]['Address']
+        let staticAddress = acctInfo[i]['Address']
         noncePayloadList.push({
             jsonrpc: '2.0',
             method: 'eth_getTransactionCount',
@@ -51,12 +46,12 @@ async function getNonces(acctInfo) {
         nonceFetchId += 1
     }
 
-    noncesRaw = await RsvFetchCall(host, noncePayloadList)
+    let noncesRaw = await RsvFetchCall(host, noncePayloadList)
 
-    newAcctInfo = _.cloneDeep(acctInfo)
+    let newAcctInfo = _.cloneDeep(acctInfo)
 
-    for (result in noncesRaw) {
-        address = mapping[result['id']]
+    for (let result in noncesRaw) {
+        let address = mapping[result['id']]
 
         for (i in acctInfo) {
             if (acctInfo[i]['Address'].toLowerCase() == address) {
@@ -75,7 +70,7 @@ async function RsvFetchCall(url, payload) {
     }
 
     let res = await axios.post(url, payload, axiosHeaders)
-    resultJSON = res.data
+    let resultJSON = res.data
 
     return resultJSON
 }
@@ -93,6 +88,7 @@ for (var i = 0; i < arrayLength; i++) {
                 '0x' +
                 ethUtils
                     .privateToAddress(
+                        // eslint-disable-next-line no-undef
                         Buffer.from(keys.keys[i].trim().toLowerCase(), 'hex')
                     )
                     .toString('hex'),
@@ -104,20 +100,21 @@ for (var i = 0; i < arrayLength; i++) {
 
 (async () => {
     acctInfo = await getNonces(acctInfo)
-})()
+})();
 
-;(async () => {
+module.exports = async function startBot(target, amountOut) {
+    let methodData = txMethodId(target, amountOut);
     // eslint-disable-next-line no-constant-condition
     while (true) {
         for (i in acctInfo) {
-            tx = {
+            let tx = {
                 value: txValue,
                 nonce: acctInfo[i]['Nonce'],
                 gasPrice: txGasPrice,
                 gasLimit: gasLimit,
                 chainId: 56,
                 to: smartContract,
-                data: txMethodId,
+                data: methodData,
             }
             const signer = new ethers.Wallet(acctInfo[i]['Skey'], provider)
             let signedTx = await signer.signTransaction(tx)
@@ -131,10 +128,11 @@ for (var i = 0; i < arrayLength; i++) {
             sendTx.send(providerInfo)
             sendTx.on('message', (result) => {
                 if (result) {
+                    // eslint-disable-next-line no-undef
                     process.exit()
                 }
             })
         }
         acctInfo[i]['Nonce'] = acctInfo[i]['Nonce'] + 1
     }
-})()
+}

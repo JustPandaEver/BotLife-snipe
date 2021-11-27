@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+
 const { ethers, BigNumber } = require('ethers')
 
 async function sendTransaction(providerInfo) {
@@ -8,8 +8,7 @@ async function sendTransaction(providerInfo) {
             providerInfo.provider
         )
         await signer.sendTransaction(providerInfo.tx)
-        console.log(object)
-        const balance = await provider.getBalance(providerInfo.contract)
+        const balance = await providerInfo.provider.getBalance(providerInfo.contract)
         if (balance.eq(BigNumber(0))) {
             return true
         }
@@ -19,7 +18,9 @@ async function sendTransaction(providerInfo) {
     }
 }
 
+// eslint-disable-next-line no-undef
 process.on('message', (providerInfo) => {
     const result = sendTransaction(providerInfo)
+    // eslint-disable-next-line no-undef
     process.send(result)
 })

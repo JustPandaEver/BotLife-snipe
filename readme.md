@@ -10,6 +10,11 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 - [ ] Optimize bot.js
 - [ ] Optimize contract.js
 - [ ] Link contract.js with bot.js
+    - [ ] Add block delay option to bot.js
+    - [ ] Separate sell to a different script
+    - [x] Add argument for minimum token output
+    - [ ] Add percent to sell argument
+    - [ ] Determine when to sell
 - [ ] Rewrite in GoLang
 - [ ] Test the bot
 - [ ] Develop limit buy/sell
@@ -22,3 +27,9 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
     - [ ] Marketing wallet
 - [ ] Link to bloXroute
 - [ ] Comment bot.js
+- [ ] Develop frontend
+- [ ] Add sell function to spam.sol
+- [ ] Create script to fill wallets
+- [x] Rename the scripts
+
+Cancel transactions that didn't succeed?
