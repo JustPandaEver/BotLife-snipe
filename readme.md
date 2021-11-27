@@ -10,7 +10,7 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 - [ ] Optimize bot.js
 - [ ] Optimize contract.js
 - [x] Link contract.js with bot.js
-    - [ ] Add block delay option to bot.js
+    - [x] Add block delay option to bot.js
     - [x] Separate sell to a different script
     - [x] Add argument for minimum token output
     - [x] Add percent to sell argument

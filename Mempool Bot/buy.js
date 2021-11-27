@@ -102,8 +102,14 @@ for (var i = 0; i < arrayLength; i++) {
     acctInfo = await getNonces(acctInfo)
 })();
 
-module.exports = async function startBot(target, amountOut, tries) {
+module.exports = async function startBot(target, amountOut, tries, tx, blockDelay) {
     let methodData = txMethodId(target, amountOut);
+    if (blockDelay > 0) { // Not sure this delay will work
+        const receiptLP = await tx.wait()
+        const buyBlock = receiptLP.blockNumber + (blockDelay - 2) // What block to buy on. Why - 2?
+        // eslint-disable-next-line no-empty
+        while ((await provider.getBlockNumber()) < buyBlock) {}
+    } 
     // eslint-disable-next-line no-constant-condition
     for (let j = 0; j <= tries; j++) {
         for (i in acctInfo) {
