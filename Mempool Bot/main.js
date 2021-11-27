@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node --max-old-space-size=100000
 /* eslint-disable no-empty */
-
+//inputs (args) --> snipeType, target, method, X, %, tries, amountIn
 
 
 ////////////////IMPORTS//////////////////// 
@@ -91,14 +91,18 @@ const startConnection = () => {
         approveToken(toSnipe) 
 
         let amountOut = myArgs[3]
+        let tries = myArgs[4]
+        let multiplier = myArgs[5]
+        let percent = myArgs[6]
+        let amountIn = myArgs[7]
         provider.on('pending', async (txHash) => { // Look through the mempool
             provider.getTransaction(txHash).then(async (tx) => { // Get the transaction from the hash
                 if (tx && tx.to) { // Check the transaction exists and it has a to address
                     switch (snipeType) { // Use the snipe type we select
                         case '1':
                             if (reDX.test(tx.data)) { // Search the mempool for the selected method
-                                spamBot(toSnipe, amountOut) // Buy the token and pass on the transaction
-                                sell() // Needs arguments
+                                spamBot(toSnipe, amountOut, tries) // Buy the token and pass on the transaction
+                                sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
 
@@ -111,8 +115,8 @@ const startConnection = () => {
                                             value: tx.value,
                                         })
                                     if (toSnipe === decodedInput.args[0]) {
-                                        spamBot(toSnipe, amountOut)
-                                        sell()
+                                        spamBot(toSnipe, amountOut, tries)
+                                        sell(toSnipe, multiplier, percent, amountIn)
                                     }
                                 }
                             }
@@ -125,23 +129,23 @@ const startConnection = () => {
                                 re6.test(tx.data) ||
                                 re7.test(tx.data)
                             ) {
-                                spamBot(toSnipe, amountOut)
-                                sell()
+                                spamBot(toSnipe, amountOut, tries)
+                                sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
 
                         case '4':
                             if (trading1.test(tx.data)) {
                                 if (tx.to === toSnipe) {
-                                    spamBot(toSnipe, amountOut)
-                                    sell()
+                                    spamBot(toSnipe, amountOut, tries)
+                                    sell(toSnipe, multiplier, percent, amountIn)
                                 }
                             }
                             break
                         case '5':
                             if (re8.test(tx.data)) {
-                                spamBot(toSnipe, amountOut)
-                                sell()
+                                spamBot(toSnipe, amountOut, tries)
+                                sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
                     }

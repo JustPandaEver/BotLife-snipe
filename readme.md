@@ -9,12 +9,12 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 - [ ] Fix sendtx.js
 - [ ] Optimize bot.js
 - [ ] Optimize contract.js
-- [ ] Link contract.js with bot.js
+- [x] Link contract.js with bot.js
     - [ ] Add block delay option to bot.js
-    - [ ] Separate sell to a different script
+    - [x] Separate sell to a different script
     - [x] Add argument for minimum token output
-    - [ ] Add percent to sell argument
-    - [ ] Determine when to sell
+    - [x] Add percent to sell argument
+    - [x] Determine when to sell
 - [ ] Rewrite in GoLang
 - [ ] Test the bot
 - [ ] Develop limit buy/sell
@@ -28,8 +28,8 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 - [ ] Link to bloXroute
 - [ ] Comment bot.js
 - [ ] Develop frontend
-- [ ] Add sell function to spam.sol
 - [ ] Create script to fill wallets
 - [x] Rename the scripts
+- [ ] Create config file
 
 Cancel transactions that didn't succeed?

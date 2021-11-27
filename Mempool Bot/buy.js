@@ -1,3 +1,5 @@
+// inputs --> target, amountOut, tries
+
 const { ethers } = require('ethers')
 const axios = require('axios').default
 var _ = require('lodash')
@@ -11,8 +13,6 @@ let smartContract = '0xa34FE6296e6AFB7d8Ba7433465C9e4289A95786C'
 let txValue = 1
 let txGasPrice = 5000000000
 let gasLimit = 5000000
-
-// args --> method, target, amountOut, tries
 
 const provider = new ethers.providers.JsonRpcProvider(
     'wss://bsc-ws-node.nariox.org:443'
@@ -102,10 +102,10 @@ for (var i = 0; i < arrayLength; i++) {
     acctInfo = await getNonces(acctInfo)
 })();
 
-module.exports = async function startBot(target, amountOut) {
+module.exports = async function startBot(target, amountOut, tries) {
     let methodData = txMethodId(target, amountOut);
     // eslint-disable-next-line no-constant-condition
-    while (true) {
+    for (let j = 0; j <= tries; j++) {
         for (i in acctInfo) {
             let tx = {
                 value: txValue,
