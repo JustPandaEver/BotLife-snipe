@@ -22,7 +22,7 @@ const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"]) /
 const toSnipe = ethers.utils.getAddress(config["target"])
 const snipeType = config["snipeType"]
 const PCSRouter = config["PCSRouter"]
-const pcsAbi = new ethers.utils.Interface(require('./conf/abi.json'))
+const pcsAbi = new ethers.utils.Interface(require('./abi.json'))
 ///////////////////////////////////////////
 
 

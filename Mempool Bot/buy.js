@@ -67,7 +67,6 @@ async function getNonces(acctInfo) {
             }
         }
     }
-    console.log(newAcctInfo)
     return newAcctInfo
 }
 async function RsvFetchCall(url, payload) {

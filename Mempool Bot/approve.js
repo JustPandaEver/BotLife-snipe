@@ -3,9 +3,9 @@
 const ethers = require('ethers')
 const config = require('./config.json')
 
-const walletBot = new ethers.Wallet(masterKey, provider)
 const masterKey = config["masterKey"]
 const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
+const walletBot = new ethers.Wallet(masterKey, provider)
 const PCSRouter = config["PCSRouter"]
 
 

@@ -1,5 +1,5 @@
 {
-    "target" : "0x",
+    "target" : "0x10ed43c718714eb63d5aa57b78b54704e256024e",
     "botContract" : "0xa34FE6296e6AFB7d8Ba7433465C9e4289A95786C",
     "buyTxGasPrice" : "5000000000",
     "buyGasLimit" : "5000000",
@@ -8,7 +8,7 @@
     "buyMethod" : "0x25b3283e",
     "chainId" : "56",
     "PCSRouter" : "0x10ED43C718714eb63d5aA57B78B54704E256024E",
-    "masterKey" : "",
+    "masterKey" : "120a44a051725e36d2b0f656e44b72505b461a2de8a0da3a276d1c0b6994bd7a",
     "wBNB" : "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
     "sellGasLimit" : "10000000",
     "sellGasPrice" : "15000000000",

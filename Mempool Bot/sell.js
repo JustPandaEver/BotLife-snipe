@@ -4,13 +4,13 @@ const ethers = require('ethers')
 const config = require('./config.json')
 
 //const account = new ethers.Wallet(process.env.MNEMONIC, provider);
-const walletBot = new ethers.Wallet(masterKey, provider)
+const masterKey = config["masterKey"]
 const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
+const walletBot = new ethers.Wallet(masterKey, provider)
 const PCSRouter = config["PCSRouter"]
 const wBNB = config["wBNB"]
-const pcsAbi = new ethers.utils.Interface(require('./conf/abi.json'))
+const pcsAbi = new ethers.utils.Interface(require('./abi.json'))
 const router = new ethers.Contract(PCSRouter, pcsAbi, walletBot)
-const masterKey = config["masterKey"]
 
 
 ///////////////FIND BALANCE////////////////// --> Find how many tokens we received
