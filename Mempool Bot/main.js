@@ -54,7 +54,7 @@ const KEEP_ALIVE_CHECK_INTERVAL = 15000
 ////////////////////CHOOSE METHOD////////////
 const startConnection = () => {
 
-    console.log('Waiting for Transaction Data...\n')
+    console.log('Searching for transaction...\n')
 
     let pingTimeout = null
     let keepAliveInterval = null
@@ -82,6 +82,7 @@ const startConnection = () => {
                     switch (snipeType) { // Use the snipe type we select
                         case 'dxsale':
                             if (reDX.test(tx.data)) { // Search the mempool for the selected method
+                                console.log("Transaction found: " + tx.hash + "\n");
                                 spamBot(toSnipe, tx, blockDelay) // Buy the token and pass on the transaction
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }
@@ -96,6 +97,7 @@ const startConnection = () => {
                                             value: tx.value,
                                         })
                                     if (toSnipe === decodedInput.args[0]) {
+                                        console.log("Transaction found: " + tx.hash + "\n");
                                         spamBot(toSnipe, tx, blockDelay)
                                         sell(toSnipe, multiplier, percent, amountIn)
                                     }
@@ -110,6 +112,7 @@ const startConnection = () => {
                                 re6.test(tx.data) ||
                                 re7.test(tx.data)
                             ) {
+                                console.log("Transaction found: " + tx.hash + "\n");
                                 spamBot(toSnipe, tx, blockDelay)
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }
@@ -118,6 +121,7 @@ const startConnection = () => {
                         case 'enabletrading':
                             if (trading1.test(tx.data)) {
                                 if (tx.to === toSnipe) {
+                                    console.log("Transaction found: " + tx.hash + "\n");
                                     spamBot(toSnipe, tx, blockDelay)
                                     sell(toSnipe, multiplier, percent, amountIn)
                                 }
@@ -125,6 +129,7 @@ const startConnection = () => {
                             break
                         case 'pinksale':
                             if (re8.test(tx.data)) {
+                                console.log("Transaction found: " + tx.hash + "\n");
                                 spamBot(toSnipe, tx, blockDelay)
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }

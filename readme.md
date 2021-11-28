@@ -19,7 +19,7 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
     - [x] Add argument for minimum token output
     - [x] Add percent to sell argument
     - [x] Determine when to sell
-    - [ ] Add verbose
+    - [x] Add verbose
 - [ ] Link to bloXroute
 - [x] Add option for minimum amount out
 - [x] Add selector for buy method

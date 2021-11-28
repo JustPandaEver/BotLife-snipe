@@ -4,7 +4,8 @@ const config = require('./config.json')
 
 async function sendTransaction(providerInfo) {
     const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
-    console.log(await provider.sendTransaction(providerInfo.tx)) // Send the transaction to the network
+    let receipt = await provider.sendTransaction(providerInfo.tx) // Send the transaction to the network
+    console.log("Buy receipt: " + receipt.hash + "\n");
 }
 
 // eslint-disable-next-line no-undef

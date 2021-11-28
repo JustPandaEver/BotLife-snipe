@@ -66,6 +66,7 @@ module.exports = async function startBot(target, tx, blockDelay) {
         // eslint-disable-next-line no-empty
         while ((await provider.getBlockNumber()) < buyBlock) {}
     }
+    console.log("Beginning buys...\n");
     // eslint-disable-next-line no-constant-condition
     for (i in acctInfo) { // Buy with each wallet
         let tx = { // Create the transaction
