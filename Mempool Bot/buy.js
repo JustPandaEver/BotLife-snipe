@@ -46,7 +46,7 @@ for (var i = 0; i < arrayLength; i++) { // Go through each key, add it to acctIn
         acctInfo[j] = {
             Skey: '0x' + keys.keys[i].trim(),
             Address: address,
-            Nonce: 30,
+            Nonce: 0,
         }
         getNonces(j)
     }

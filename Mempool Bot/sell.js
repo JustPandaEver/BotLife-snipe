@@ -1,6 +1,6 @@
 // inputs --> target, multiplier, percent, amountIn
 /* eslint-disable no-empty */
-const ethers = require('ethers')
+const { ethers } = require('ethers')
 const config = require('./config.json')
 
 //const account = new ethers.Wallet(process.env.MNEMONIC, provider);
@@ -57,27 +57,26 @@ async function tradeTokensForExactETHWithSupportingFee(
 
 /////////////////////MAIN////////////////////
 module.exports = async function sell(target, multiplier, percent, amountIn) {
-    const toSnipe = ethers.utils.getAddress(target)
     const sellContract = new ethers.Contract( 
-        toSnipe, // Address to connect to
+        target, // Address to connect to
         [ // ABI of contract
             'function approve(address _spender, uint256 _value) public returns (bool success)',
             'function balanceOf(address account) external view returns (uint256)',
             'function decimals() view returns (uint8)',
             'function allowance(address owner, address spender) external view returns (uint)',
         ],
-        provider // Provider or Signer
+        walletBot // Provider or Signer
     )
-    let balance = getTokenBalance(sellContract)
+    let balance = await getTokenBalance(sellContract)
     // eslint-disable-next-line no-constant-condition
     while (true) {
-        let amountOut = router.getAmountsOut(
+        let amountOut = await router.getAmountsOut(
             balance,
-            [toSnipe, wBNB]
+            [target, wBNB]
         )
         let goal = amountIn.mul(multiplier)
-        if (amountOut.gt(goal)) {
-            await tradeTokensForExactETHWithSupportingFee(toSnipe, balance, percent)
+        if (amountOut[1].gte(goal)) {
+            await tradeTokensForExactETHWithSupportingFee(target, balance, percent)
         }
     }
 }

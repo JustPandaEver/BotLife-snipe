@@ -118,9 +118,8 @@ const startConnection = () => {
                         case 'enabletrading':
                             if (trading1.test(tx.data)) {
                                 if (tx.to === toSnipe) {
-                                    //console.log('trading enabled');
                                     spamBot(toSnipe, tx, blockDelay)
-                                    //sell(toSnipe, multiplier, percent, amountIn)
+                                    sell(toSnipe, multiplier, percent, amountIn)
                                 }
                             }
                             break
