@@ -75,7 +75,7 @@ module.exports = async function sell(target, multiplier, percent, amountIn) {
             balance,
             [toSnipe, wBNB]
         )
-        let goal = amountIn.mul(1e18).mul(multiplier)
+        let goal = amountIn.mul(multiplier)
         if (amountOut.gt(goal)) {
             await tradeTokensForExactETHWithSupportingFee(toSnipe, balance, percent)
         }

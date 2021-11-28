@@ -5,11 +5,10 @@
 
 ////////////////IMPORTS//////////////////// 
 'use strict'
-const { exec } = require('child_process')
 // eslint-disable-next-line no-undef
 const ethers = require('ethers')
 const spamBot = require('./buy.js')
-const approveToken = require('./approve.js')
+//const approveToken = require('./approve.js')
 const sell = require('./sell.js')
 const config = require('./config.json')
 //Object.assign(process.env, env)
@@ -55,21 +54,10 @@ const KEEP_ALIVE_CHECK_INTERVAL = 15000
 ////////////////////CHOOSE METHOD////////////
 const startConnection = () => {
 
-
-    console.log(
-        '1 = DX \n2 = AddLiq \n3 = Uni \n4 = TradingEnabled SnipeID Address MethodIDofTradingEnabled'
-    )
-    console.log('--blockDelay # blocks to delay buy after liquidity add')
     console.log('Waiting for Transaction Data...\n')
 
-
-    // eslint-disable-next-line no-unused-vars
-    exec('./clean', (err, stdout, stderr) => {
-        console.log(stdout)
-    })
     let pingTimeout = null
     let keepAliveInterval = null
-
 
     //Open the WSS
     provider._websocket.on('open', async () => {
@@ -82,9 +70,8 @@ const startConnection = () => {
 
 
         // Approve the token
-        approveToken(toSnipe) 
+        //approveToken(toSnipe) 
 
-        let amountOut = config["expectedAmountOut"]
         let multiplier = config["multiplier"]
         let percent = config["percentToSell"];
         const amountIn = await provider.getBalance(config["botContract"])
@@ -95,8 +82,8 @@ const startConnection = () => {
                     switch (snipeType) { // Use the snipe type we select
                         case 'dxsale':
                             if (reDX.test(tx.data)) { // Search the mempool for the selected method
-                                spamBot(toSnipe, amountOut, tx, blockDelay) // Buy the token and pass on the transaction
-                                sell(toSnipe, multiplier, percent, amountIn())
+                                spamBot(toSnipe, tx, blockDelay) // Buy the token and pass on the transaction
+                                sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
 
@@ -109,8 +96,8 @@ const startConnection = () => {
                                             value: tx.value,
                                         })
                                     if (toSnipe === decodedInput.args[0]) {
-                                        spamBot(toSnipe, amountOut, tx, blockDelay)
-                                        sell(toSnipe, multiplier, percent, amountIn())
+                                        spamBot(toSnipe, tx, blockDelay)
+                                        sell(toSnipe, multiplier, percent, amountIn)
                                     }
                                 }
                             }
@@ -123,23 +110,24 @@ const startConnection = () => {
                                 re6.test(tx.data) ||
                                 re7.test(tx.data)
                             ) {
-                                spamBot(toSnipe, amountOut, tx, blockDelay)
-                                sell(toSnipe, multiplier, percent, amountIn())
+                                spamBot(toSnipe, tx, blockDelay)
+                                sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
 
                         case 'enabletrading':
                             if (trading1.test(tx.data)) {
                                 if (tx.to === toSnipe) {
-                                    spamBot(toSnipe, amountOut, tx, blockDelay)
-                                    sell(toSnipe, multiplier, percent, amountIn())
+                                    //console.log('trading enabled');
+                                    spamBot(toSnipe, tx, blockDelay)
+                                    //sell(toSnipe, multiplier, percent, amountIn)
                                 }
                             }
                             break
                         case 'pinksale':
                             if (re8.test(tx.data)) {
-                                spamBot(toSnipe, amountOut, tx, blockDelay)
-                                sell(toSnipe, multiplier, percent, amountIn())
+                                spamBot(toSnipe, tx, blockDelay)
+                                sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
                     }

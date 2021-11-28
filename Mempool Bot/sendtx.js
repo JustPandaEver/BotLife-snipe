@@ -1,16 +1,10 @@
 
 const { ethers } = require('ethers')
+const config = require('./config.json')
 
 async function sendTransaction(providerInfo) {
-    try {
-        const signer = new ethers.Wallet( // Create our signer
-            providerInfo.acct,
-            providerInfo.provider
-        )
-        await signer.sendTransaction(providerInfo.tx) // Send the transaction to the network
-    } catch (error) {
-        console.log('Exception occurred in sendTransaction')
-    }
+    const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
+    console.log(await provider.sendTransaction(providerInfo.tx)) // Send the transaction to the network
 }
 
 // eslint-disable-next-line no-undef
@@ -19,3 +13,4 @@ process.on('message', (providerInfo) => {
     // eslint-disable-next-line no-undef
     process.send(result)
 })
+

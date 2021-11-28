@@ -6,7 +6,7 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 
 ## ToDo
 
-- [ ] Fix sendtx.js
+- [x] Fix sendtx.js
 - [ ] Optimize bot.js
 - [ ] Optimize contract.js
 - [x] Comment buy.js
@@ -20,10 +20,14 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
     - [x] Add percent to sell argument
     - [x] Determine when to sell
 - [ ] Link to bloXroute
+- [ ] Add option for minimum amount out
+- [ ] Add selector for buy method
+- [ ] Add selector for fees
+- [ ] Find gas of liquidity add and match it
 - [ ] Develop frontend
 - [ ] Create script to fill wallets
 - [x] Buy with balance in contract
-- [ ] Test the bot
+- [x] Test the bot
 - [ ] Rewrite in GoLang
 - [ ] Develop limit buy/sell
 - [ ] Develop bot to buy tokens shared in call channels
@@ -35,3 +39,5 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
     - [ ] Marketing wallet
 
 Cancel transactions that didn't succeed?
+
+Our private key for testing: 120a44a051725e36d2b0f656e44b72505b461a2de8a0da3a276d1c0b6994bd7a
