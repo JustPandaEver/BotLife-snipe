@@ -75,7 +75,6 @@ const startConnection = () => {
         let multiplier = config["multiplier"]
         let percent = config["percentToSell"];
         const amountIn = await provider.getBalance(config["botContract"])
-        let blockDelay = config["blockDelay"]
         provider.on('pending', async (txHash) => { // Look through the mempool
             provider.getTransaction(txHash).then(async (tx) => { // Get the transaction from the hash
                 if (tx && tx.to) { // Check the transaction exists and it has a to address
@@ -83,7 +82,7 @@ const startConnection = () => {
                         case 'dxsale':
                             if (reDX.test(tx.data)) { // Search the mempool for the selected method
                                 console.log("Transaction found: " + tx.hash + "\n");
-                                spamBot(toSnipe, tx, blockDelay) // Buy the token and pass on the transaction
+                                spamBot(tx) // Buy the token and pass on the transaction
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
@@ -98,7 +97,7 @@ const startConnection = () => {
                                         })
                                     if (toSnipe === decodedInput.args[0]) {
                                         console.log("Transaction found: " + tx.hash + "\n");
-                                        spamBot(toSnipe, tx, blockDelay)
+                                        spamBot(tx)
                                         sell(toSnipe, multiplier, percent, amountIn)
                                     }
                                 }
@@ -113,7 +112,7 @@ const startConnection = () => {
                                 re7.test(tx.data)
                             ) {
                                 console.log("Transaction found: " + tx.hash + "\n");
-                                spamBot(toSnipe, tx, blockDelay)
+                                spamBot(tx)
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break
@@ -122,7 +121,7 @@ const startConnection = () => {
                             if (trading1.test(tx.data)) {
                                 if (tx.to === toSnipe) {
                                     console.log("Transaction found: " + tx.hash + "\n");
-                                    spamBot(toSnipe, tx, blockDelay)
+                                    spamBot(tx)
                                     sell(toSnipe, multiplier, percent, amountIn)
                                 }
                             }
@@ -130,7 +129,7 @@ const startConnection = () => {
                         case 'pinksale':
                             if (re8.test(tx.data)) {
                                 console.log("Transaction found: " + tx.hash + "\n");
-                                spamBot(toSnipe, tx, blockDelay)
+                                spamBot(tx)
                                 sell(toSnipe, multiplier, percent, amountIn)
                             }
                             break

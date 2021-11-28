@@ -14,6 +14,8 @@ const config = require('./config.json')
 let smartContract = config["botContract"]
 let buyGasLimit = config["buyGasLimit"]
 let minAmtOut = config["minAmountOut"]
+let target = config["target"]
+let blockDelay = config["blockDelay"]
 const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
 ///////////////////////////////////////////////
 
@@ -57,8 +59,8 @@ for (var i = 0; i < arrayLength; i++) { // Go through each key, add it to acctIn
 
 
 //////////////////////BUY//////////////////////
-module.exports = async function startBot(target, tx, blockDelay) {
-    let methodData = txMethodId(target); // Set the transaction data
+let methodData = txMethodId(target); // Set the transaction data
+module.exports = async function startBot(tx) {
     let goalGas = tx.gasPrice
     if (blockDelay > 0) { // Not sure this delay will work
         const receiptLP = await tx.wait()
