@@ -12,7 +12,6 @@ const config = require('./config.json')
 
 ////////////////CONFIG/////////////////////////
 let smartContract = config["botContract"]
-let buyTxGasPrice = config["buyTxGasPrice"]
 let buyGasLimit = config["buyGasLimit"]
 const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
 ///////////////////////////////////////////////
@@ -69,7 +68,7 @@ module.exports = async function startBot(target, tx, blockDelay) {
         let tx = { // Create the transaction
             value: 0,
             nonce: acctInfo[i]['Nonce'],
-            gasPrice: ethers.BigNumber.from(buyTxGasPrice),
+            gasPrice: tx.gasPrice,
             gasLimit: ethers.BigNumber.from(buyGasLimit),
             chainId: parseInt(config["chainId"], 10),
             to: smartContract,

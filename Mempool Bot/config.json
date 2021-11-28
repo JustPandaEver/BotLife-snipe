@@ -1,7 +1,6 @@
 {
     "target" : "0x57A92eb8Ce0dEbF5AF3F8523A7A56907cf434dd4",
     "botContract" : "0xfB3fa9BE020D7A7E149FdcEB55663ecdaC6AA727",
-    "buyTxGasPrice" : "18000000000",
     "buyGasLimit" : "5000000",
     "RpcProvider" : "wss://bsc.getblock.io/testnet/?api_key=b97342bc-55a6-442e-b015-ff12e0a76356",
     "buyMethod" : "0xf088d547",

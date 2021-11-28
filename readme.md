@@ -24,7 +24,7 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 - [ ] Add option for minimum amount out
 - [ ] Add selector for buy method
 - [ ] Add selector for fees
-- [ ] Find gas of liquidity add and match it
+- [x] Find gas of liquidity add and match it
 - [ ] Develop frontend
 - [ ] Create script to fill wallets
 - [x] Buy with balance in contract
