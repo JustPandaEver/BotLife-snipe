@@ -22,19 +22,22 @@ interface IUniswapV2Router01 {
     function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 }
 interface IUniswapV2Router02 is IUniswapV2Router01 {
+    function swapExactETHForTokensSupportingFeeOnTransferTokens(uint amountOutMin, address[] calldata path, address to, uint deadline)
+    external
+    payable;
 }
 
 contract buyTokens{
 
-    IUniswapV2Router02 public immutable uniswapV2Router;
+    IUniswapV2Router02 public uniswapV2Router;
 
     address _owner;
-    address toAddy = 0x79708C882483A93C9F6f1D385a5301e1E08B0438;
-    address WBNB = 0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c;
+    address toAddy = 0x15F865Ef3090930812e17249264b919b76317C58;
+    address WBNB = 0x0dE8FCAE8421fc79B29adE9ffF97854a424Cad09;
 
     mapping(address => bool) public allowed;
 
-    address[] allowedAddy =  [0x79708C882483A93C9F6f1D385a5301e1E08B0438];
+    address[] allowedAddy =  [0x15F865Ef3090930812e17249264b919b76317C58];
 
     event WhitelistedAddressAdded(address addr);
 
@@ -48,9 +51,9 @@ contract buyTokens{
         _;
     }
 
-    constructor(){
+    constructor() {
         _owner = msg.sender;
-        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
+        IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0xCc7aDc94F3D80127849D2b41b6439b7CF1eB4Ae0);
         uniswapV2Router = _uniswapV2Router;
 
         for (uint i; i< allowedAddy.length;i++){
@@ -58,32 +61,13 @@ contract buyTokens{
         }
     }
 
-    function memBuy(address tokenAddress) public onlySniper {
-        address[] memory path = new address[](2);
-        path[0] = WBNB;
-        path[1] = tokenAddress;
-
-        uniswapV2Router.swapExactETHForTokens{value: address(this).balance}(1, path, toAddy, block.timestamp + 21);
-    }
-
-    function buy(address tokenAddress) public onlySniper {
-        address[] memory path = new address[](2);
-        path[0] = WBNB;
-        path[1] = tokenAddress;
-        uniswapV2Router.getAmountsOut(address(this).balance, path);
-
-        uniswapV2Router.swapExactETHForTokens{value: address(this).balance}(1, path, toAddy, block.timestamp + 21);
-    }
-
-    function buy2(address tokenAddress, uint amtOut, int x) public onlySniper {
+    function buy(address tokenAddress, uint amtOut) public onlySniper {
         address[] memory path = new address[](2);
         path[0] = WBNB;
         path[1] = tokenAddress;
         uniswapV2Router.getAmountsIn(amtOut, path);
 
-        for (int i = 0; i < x; i++) {
-          uniswapV2Router.swapETHForExactTokens{value: address(this).balance}(amtOut, path, toAddy, block.timestamp + 21);
-        }
+        uniswapV2Router.swapExactETHForTokensSupportingFeeOnTransferTokens{value: address(this).balance}(amtOut, path, toAddy, block.timestamp + 100);
 
     }
 

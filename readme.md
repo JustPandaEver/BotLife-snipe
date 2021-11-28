@@ -21,9 +21,9 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
     - [x] Determine when to sell
     - [ ] Add verbose
 - [ ] Link to bloXroute
-- [ ] Add option for minimum amount out
-- [ ] Add selector for buy method
-- [ ] Add selector for fees
+- [x] Add option for minimum amount out
+- [x] Add selector for buy method
+- [x] Add selector for fees
 - [x] Find gas of liquidity add and match it
 - [ ] Develop frontend
 - [ ] Create script to fill wallets

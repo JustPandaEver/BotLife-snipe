@@ -13,6 +13,7 @@ const config = require('./config.json')
 ////////////////CONFIG/////////////////////////
 let smartContract = config["botContract"]
 let buyGasLimit = config["buyGasLimit"]
+let minAmtOut = config["minAmountOut"]
 const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
 ///////////////////////////////////////////////
 
@@ -20,7 +21,8 @@ const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
 //////////////BUY METHOD///////////////////////
 function txMethodId(target) { // Set the data for the transaction
     let method = config['buyMethod'] +
-    rjust(target.replace('0x', ''), 64, '0')
+    rjust(target.replace('0x', ''), 64, '0') +
+    rjust(parseInt(minAmtOut).toString(16).replace('x', ''), 64, '0')
     return method;
 }
 ///////////////////////////////////////////////
@@ -57,6 +59,7 @@ for (var i = 0; i < arrayLength; i++) { // Go through each key, add it to acctIn
 //////////////////////BUY//////////////////////
 module.exports = async function startBot(target, tx, blockDelay) {
     let methodData = txMethodId(target); // Set the transaction data
+    let goalGas = tx.gasPrice
     if (blockDelay > 0) { // Not sure this delay will work
         const receiptLP = await tx.wait()
         const buyBlock = receiptLP.blockNumber + (blockDelay - 2) // What block to buy on. Why - 2?
@@ -68,7 +71,7 @@ module.exports = async function startBot(target, tx, blockDelay) {
         let tx = { // Create the transaction
             value: 0,
             nonce: acctInfo[i]['Nonce'],
-            gasPrice: tx.gasPrice,
+            gasPrice: goalGas,
             gasLimit: ethers.BigNumber.from(buyGasLimit),
             chainId: parseInt(config["chainId"], 10),
             to: smartContract,
