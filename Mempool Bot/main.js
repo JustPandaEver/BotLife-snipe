@@ -8,7 +8,7 @@
 // eslint-disable-next-line no-undef
 const ethers = require('ethers')
 const spamBot = require('./buy.js')
-//const approveToken = require('./approve.js')
+const approveToken = require('./approve.js')
 const sell = require('./sell.js')
 const config = require('./config.json')
 //Object.assign(process.env, env)
@@ -70,7 +70,7 @@ const startConnection = () => {
 
 
         // Approve the token
-        //approveToken(toSnipe) 
+        approveToken(toSnipe) 
 
         let multiplier = config["multiplier"]
         let percent = config["percentToSell"];

@@ -5,25 +5,24 @@ const config = require('./config.json')
 
 const masterKey = config["masterKey"]
 const provider = new ethers.providers.WebSocketProvider(config["RpcProvider"])
-const walletBot = new ethers.Wallet(masterKey, provider)
+const walletBot = new ethers.Wallet("0x" + masterKey, provider)
 const PCSRouter = config["PCSRouter"]
 
 
 
 ///////////////////INIT//////////////////////
 module.exports = async function init(tokenToPurchase) {
-    const toSnipe = ethers.utils.getAddress(tokenToPurchase)
     const sellContract = new ethers.Contract( 
-        toSnipe, // Address to connect to
+        tokenToPurchase, // Address to connect to
         [ // ABI of contract
             'function approve(address _spender, uint256 _value) public returns (bool success)',
             'function balanceOf(address account) external view returns (uint256)',
             'function decimals() view returns (uint8)',
             'function allowance(address owner, address spender) external view returns (uint)',
         ],
-        provider // Provider or Signer
+        walletBot // Provider or Signer
     )
-    await approveToken(toSnipe, sellContract);
+    await approveToken(tokenToPurchase, sellContract);
 }
 /////////////////////////////////////////////
 
@@ -43,6 +42,8 @@ async function approveToken(toSnipe, sellContract) {
             await tx.wait()
             console.log('Token Approved')
         }
-    } catch (e) {}
+    } catch (e) {
+        console.log('Approve Failed');
+    }
 }
 ///////////////////////////////////////////////
