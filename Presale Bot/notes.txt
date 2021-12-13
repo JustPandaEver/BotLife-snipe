@@ -1,0 +1,21 @@
+just look for when other people start sending to the presale contract
+then sum these values
+find gas of last transaction that leaves room
+place transaction with slightly higher gas
+
+track: 0xd7bb99ba
+must be between min and max
+
+pinksale data:
+106: start time
+130: min contrib
+131: max buy
+132: soft cap
+133: hard cap
+
+TX format:
+hash: '0x2569a4265966174aa261eb7d775e2b24866140580d4a6759fdb1b076d1cc0e30',
+gasPrice: BigNumber { _hex: '0x0147b4d280', _isBigNumber: true },
+gasLimit: BigNumber { _hex: '0x05cc60', _isBigNumber: true },
+to: '0x98767abab06e45a181Ab73AE4cD0FeCd0FBD0cD0',
+value: BigNumber { _hex: '0x00', _isBigNumber: true },
