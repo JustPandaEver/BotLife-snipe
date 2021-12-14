@@ -1,34 +1,83 @@
 const ethers = require("ethers");
 const config = require('./config.json')
 const ethUtils = require('ethereumjs-util')
+const approveToken = require('./approve.js')
 
 const provider = new ethers.providers.WebSocketProvider(config["provider"]);
 const wallet = new ethers.Wallet(config["privateKey"], provider)
 
-//////////////WATCHDOG////////////////////// --> Make sure we stay connected
-const EXPECTED_PONG_BACK = 30000
-const KEEP_ALIVE_CHECK_INTERVAL = 15000
-////////////////////////////////////////////
 
 async function storage(storageInt) {
-    return parseInt(await provider.getStorageAt(config["presaleAddress"], storageInt), 16);
+    return await provider.getStorageAt(config["presaleAddress"], storageInt);
+}
+
+const storageAddress = {
+  pinkSale : {
+    startTime : 106,
+    minBuy : 130,
+    maxBuy : 131,
+    hardCap : 133,
+    tokenAddress : 105,
+    startBlock: 0
+  },
+  dxSale : {
+    startTime : 45,
+    minBuy : 26,
+    maxBuy : 27,
+    hardCap : 44,
+    tokenAddress : 0,
+    startBlock: 0
+  },
+  unicrypt : {
+    startTime : 0,
+    minBuy : 0,
+    maxBuy : 5,
+    hardCap : 7,
+    tokenAddress : 2,
+    startBlock: 11
+  }
 }
 
 const wait = async () => {
-  const startTime = await storage(106)
-  const minBuy = (await storage(130)).toString()
-  const maxBuy = (await storage(131)).toString()
-  const hardCap = ethers.BigNumber.from((await storage(133)).toString())
-  let contributedAmount = ethers.BigNumber.from(0);
+  async function data(data) {
+    startTime = parseInt(await storage(data.startTime), 16)
+    minBuy = ethers.BigNumber.from(parseInt((await storage(data.minBuy)), 16).toString())
+    maxBuy = ethers.BigNumber.from((await storage(data.maxBuy)).toString())
+    hardCap = ethers.BigNumber.from(parseInt((await storage(data.hardCap)), 16).toString())
+    tokenAddress = "0x" + (await storage(data.tokenAddress)).toString().slice(26, 66)
+    startBlock = parseInt(await storage(data.startBlock), 16)
+  }
+  let zero = ethers.BigNumber.from(0)
+  let contributedAmount = zero;
   let nonce = (await provider.getTransactionCount('0x' + ethUtils.privateToAddress(Buffer.from(config["privateKey"].trim().toLowerCase(), 'hex')).toString('hex'))) // quite janky just make sure to use a fresh wallet
-  while (startTime - unix() > 2) { 
-    process.stdout.write(startTime - unix() + " Seconds remaining\n");
-    await new Promise(r => setTimeout(r, 500));
+  
+  if (config["action"] == "pinkSale") {
+    await data(storageAddress.pinkSale)
+  } else if (config["action"] == "dxSale") {
+    await data(storageAddress.dxSale)
+    hardCap = hardCap.mul(ethers.BigNumber.from(10).pow(19))
+  } else if (config["action"] == "unicrypt") {
+    await data(storageAddress.unicrypt)
+    minBuy = zero
+  }
+  console.log(startTime + "\n" + minBuy + "\n" + maxBuy + "\n" + hardCap + "\n" + tokenAddress + "\n" + startBlock);
+  approveToken(tokenAddress)
+  if (config["action"] == "pinkSale" || config["action"] == "dxSale") {
+    while (startTime - unix() > 4) { 
+      process.stdout.write(startTime - unix() + " Seconds remaining\n");
+      await new Promise(r => setTimeout(r, 500));
+    }
+  }
+  if (config["action"] == "unicrypt") {
+    while (await provider.getBlockNumber() < (startBlock - 2)) {
+      console.log("Current Block:" + await provider.getBlockNumber());
+      await new Promise(r => setTimeout(r, 1000));
+    }
   }
   provider.on('pending', async (txHash) => { // Look through the mempool
       provider.getTransaction(txHash).then(async (tx) => { // Get the transaction from the hash
           if (tx && tx.to) {
-            if (tx.to === config["presaleAddress"] && tx.value.lte(maxBuy) && tx.value.gte(minBuy)) {
+            if (tx.to === config["presaleAddress"] || tx.data.slice(0, 10) == "0xf868e766" && tx.value.lte(maxBuy) && tx.value.gte(minBuy)) {
             contributedAmount = tx.value.add(contributedAmount)
             if (contributedAmount.gte(hardCap.mul(config["percentFill"]).div(100))) {
               let sendTx = { // Create the transaction

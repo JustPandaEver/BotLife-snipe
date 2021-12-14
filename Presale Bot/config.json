@@ -1,8 +1,10 @@
 {
-    "presaleAddress" : "0xdC80C1d286D7f7E76d8cD4dBA9329FAe9536fE44",
-    "provider" : "wss://bsc.getblock.io/testnet/?api_key=b97342bc-55a6-442e-b015-ff12e0a76356",
+    "presaleAddress" : "0x42f354d035bb241417D1A5ad3f6F467756Fd51aC",
+    "provider" : "ws://127.0.0.1:8546",
     "percentFill" : "85",
     "privateKey" : "4731e3631170edfd66445eb9d3fc21fea1bc01310fc7a77c253295bc507de54a",
     "chainId" : "97",
-    "amtBuy" : "2"
+    "amtBuy" : "2",
+    "PCSRouter" : "0xCc7aDc94F3D80127849D2b41b6439b7CF1eB4Ae0",
+    "action" : "dxSale"
 }
