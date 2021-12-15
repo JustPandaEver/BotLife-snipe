@@ -13,10 +13,10 @@ const provider = new ethers.providers.WebSocketProvider(config["provider"]);
 //  }
 
 //storage()
-txHash = "0xcd0d984e0d3c4daa9ef3822e02a9bbe87c725446f96733a10ef0e459bd78af1c"
+txHash = "0xa8ab3931c3476c97f4bc3443d388a44bb3d6c163a49e87c878956b875f3e9a17"
 async function test () {
     hash = await provider.getTransaction(txHash)
-    val = hash.data.slice(0, 10)
+    val = hash.value
 console.log(await val);
 }
 test()

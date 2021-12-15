@@ -104,7 +104,7 @@ const wait = async () => {
                 txData = "0x"
               }
               let sendTx = { // Create the transaction
-                value: ethers.BigNumber.from(config["amtBuy"]).mul(ethers.BigNumber.from(10).pow(18)).div(1000),
+                value: ethers.BigNumber.from(config["amtBuy"]).mul(ethers.BigNumber.from(10).pow(18)),
                 nonce: nonce,
                 gasPrice: (tx.gasPrice).add(1),
                 gasLimit: (tx.gasLimit),
