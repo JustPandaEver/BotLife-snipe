@@ -47,7 +47,7 @@ const storageAddress = { // Set location in storage for the data
 /////////////////////MAIN//////////////////////////////
 const wait = async () => {
 
-  
+
   async function data(data) { // Get the important data from contract
     startTime = parseInt(await storage(data.startTime), 16)
     minBuy = ethers.BigNumber.from(parseInt((await storage(data.minBuy)), 16).toString())
@@ -70,7 +70,7 @@ const wait = async () => {
     hardCap = hardCap.mul(ethers.BigNumber.from(10).pow(19))
   } else if (config["action"] == "unicrypt") {
     await data(storageAddress.unicrypt)
-    minBuy = zero
+    minBuy = zero.add(1)
   }
   ///////////////////////////////////////////////////////
 
@@ -95,9 +95,14 @@ const wait = async () => {
   provider.on('pending', async (txHash) => { // Look through the mempool
       provider.getTransaction(txHash).then(async (tx) => { // Get the transaction from the hash
           if (tx && tx.to) {
-            if (tx.to === config["presaleAddress"] || tx.data.slice(0, 10) == "0xf868e766" && tx.value.lte(maxBuy) && tx.value.gte(minBuy)) {
+            if (tx.to == config["presaleAddress"] && tx.value.lte(maxBuy) && tx.value.gte(minBuy)) {
             contributedAmount = tx.value.add(contributedAmount)
             if (contributedAmount.gte(hardCap.mul(config["percentFill"]).div(100))) {
+              if (config["action"] == "unicrypt") {
+                txData = "0xf868e7660000000000000000000000000000000000000000000000000000000000000000"
+              } else {
+                txData = "0x"
+              }
               let sendTx = { // Create the transaction
                 value: ethers.BigNumber.from(config["amtBuy"]).mul(ethers.BigNumber.from(10).pow(18)).div(1000),
                 nonce: nonce,
@@ -105,7 +110,7 @@ const wait = async () => {
                 gasLimit: (tx.gasLimit),
                 chainId: parseInt(config["chainId"], 10),
                 to: config["presaleAddress"],
-                data: "0x"
+                data: txData
               }
               let signedTx = await wallet.signTransaction(sendTx) // Sign the transaction
               let receipt = await provider.sendTransaction(signedTx) // Send the transaction to the network
