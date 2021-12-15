@@ -3,15 +3,20 @@ const config = require('./config.json')
 const ethUtils = require('ethereumjs-util')
 const approveToken = require('./approve.js')
 
+
+//////////////////INIT ETHERS//////////////////////////
 const provider = new ethers.providers.WebSocketProvider(config["provider"]);
 const wallet = new ethers.Wallet(config["privateKey"], provider)
+///////////////////////////////////////////////////////
 
-
+////////////////////RETRIEVE DATA//////////////////////
 async function storage(storageInt) {
     return await provider.getStorageAt(config["presaleAddress"], storageInt);
 }
+///////////////////////////////////////////////////////
 
-const storageAddress = {
+//////////////////LOCATIONS////////////////////////////
+const storageAddress = { // Set location in storage for the data
   pinkSale : {
     startTime : 106,
     minBuy : 130,
@@ -37,9 +42,13 @@ const storageAddress = {
     startBlock: 11
   }
 }
+///////////////////////////////////////////////////////
 
+/////////////////////MAIN//////////////////////////////
 const wait = async () => {
-  async function data(data) {
+
+  
+  async function data(data) { // Get the important data from contract
     startTime = parseInt(await storage(data.startTime), 16)
     minBuy = ethers.BigNumber.from(parseInt((await storage(data.minBuy)), 16).toString())
     maxBuy = ethers.BigNumber.from((await storage(data.maxBuy)).toString())
@@ -47,10 +56,13 @@ const wait = async () => {
     tokenAddress = "0x" + (await storage(data.tokenAddress)).toString().slice(26, 66)
     startBlock = parseInt(await storage(data.startBlock), 16)
   }
+
   let zero = ethers.BigNumber.from(0)
-  let contributedAmount = zero;
+  let contributedAmount = zero; // Initialize contributed amount at 0
   let nonce = (await provider.getTransactionCount('0x' + ethUtils.privateToAddress(Buffer.from(config["privateKey"].trim().toLowerCase(), 'hex')).toString('hex'))) // quite janky just make sure to use a fresh wallet
   
+
+  ///////////////CHOOSE PLATFORM////////////////////////
   if (config["action"] == "pinkSale") {
     await data(storageAddress.pinkSale)
   } else if (config["action"] == "dxSale") {
@@ -60,8 +72,11 @@ const wait = async () => {
     await data(storageAddress.unicrypt)
     minBuy = zero
   }
-  console.log(startTime + "\n" + minBuy + "\n" + maxBuy + "\n" + hardCap + "\n" + tokenAddress + "\n" + startBlock);
-  approveToken(tokenAddress)
+  ///////////////////////////////////////////////////////
+
+  approveToken(tokenAddress) // Approve
+
+  /////////////////////WAIT//////////////////////////////
   if (config["action"] == "pinkSale" || config["action"] == "dxSale") {
     while (startTime - unix() > 4) { 
       process.stdout.write(startTime - unix() + " Seconds remaining\n");
@@ -74,6 +89,9 @@ const wait = async () => {
       await new Promise(r => setTimeout(r, 1000));
     }
   }
+  ///////////////////////////////////////////////////////
+
+  ////////////////////////BUY////////////////////////////
   provider.on('pending', async (txHash) => { // Look through the mempool
       provider.getTransaction(txHash).then(async (tx) => { // Get the transaction from the hash
           if (tx && tx.to) {
@@ -99,9 +117,12 @@ const wait = async () => {
       })
   })
 }
+///////////////////////////////////////////////////////
 
+/////////////////////TIME//////////////////////////////
 function unix() {
     return parseInt(Math.floor(new Date().getTime() / 1000));
   }
+///////////////////////////////////////////////////////
 
 wait()
