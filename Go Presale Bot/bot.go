@@ -168,7 +168,10 @@ func main() {
 	} else if cfg.Parameters.Action == "unicrypt" {
 		fmt.Println("Platform: Unicrypt")
 		storageHexVals = unicrypt
-		tx.Data = common.Hex2Bytes("0xf868e7660000000000000000000000000000000000000000000000000000000000000000")
+		tx.Data, err = hexutil.Decode("0xf868e7660000000000000000000000000000000000000000000000000000000000000000")
+		if err != nil {
+			log.Fatal(err)
+		}
 	} else {
 		log.Fatalf("Unsupported action: %v", cfg.Parameters.Action)
 	}
@@ -204,17 +207,14 @@ func main() {
 		for bigStorage.startTime.Int64()-unix() > 4 { // Block until # seconds before presale start
 		}
 	} else if cfg.Parameters.Action == "unicrypt" {
-		curBlock, err := client.BlockNumber(context.Background())
-		if err != nil {
-			log.Fatal(err)
-		}
+
 		go func() {
-			for bigStorage.startBlock.Uint64()-curBlock > 2 {
-				fmt.Printf("%v Blocks remaining\n", bigStorage.startBlock.Uint64()-curBlock)
+			for big.NewInt(0).Sub(bigStorage.startBlock, curBlock()).Cmp(big.NewInt(2)) == 1 {
+				fmt.Printf("%v Blocks remaining\n", big.NewInt(0).Sub(bigStorage.startBlock, curBlock()))
 				time.Sleep(time.Second * 3)
 			}
 		}()
-		for bigStorage.startBlock.Uint64()-curBlock > 2 { // Block until # blocks before presale start
+		for big.NewInt(0).Sub(bigStorage.startBlock, curBlock()).Cmp(big.NewInt(2)) == 1 { // Block until # blocks before presale start
 		}
 	}
 	fmt.Println("Presale started... Searching the mempool")
@@ -316,6 +316,7 @@ func storages(hexA string) *big.Int { // Retrieve the contract data
 
 	big, err := hexutil.DecodeBig(data) // Convert hex data to a big int
 	if err != nil {
+		fmt.Println(hexA)
 		log.Fatal(err)
 	}
 
@@ -324,4 +325,12 @@ func storages(hexA string) *big.Int { // Retrieve the contract data
 
 func unix() int64 { // Get the current epoch time in seconds
 	return time.Now().Unix()
+}
+
+func curBlock() *big.Int { // Get current block
+	currentBlock, err := client.BlockNumber(context.Background())
+	if err != nil {
+		log.Fatal(err)
+	}
+	return big.NewInt(int64(currentBlock))
 }
