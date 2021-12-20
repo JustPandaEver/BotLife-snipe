@@ -25,7 +25,6 @@ import (
 type Config struct { // Initialize struct for config options
 	Parameters struct {
 		Host           string  `yaml:"host"`
-		PCSAddress     string  `yaml:"pcsaddress"`
 		PrivateKey     string  `yaml:"privatekey"`
 		AmountIn       float64 `yaml:"amountin"`
 		PresaleAddress string  `yaml:"presaleaddress"`
@@ -96,6 +95,7 @@ func main() {
 	/*----------Initialize Transaction------------*/
 	presaleAddress = common.HexToAddress(cfg.Parameters.PresaleAddress) // Init presale address
 	presaleAddressPointer := &presaleAddress                            // Create a pointer type
+	presaleAddressString := presaleAddressPointer.String()              // Create string of presale address
 
 	value := big.NewInt(int64(cfg.Parameters.AmountIn * (math.Pow(10.0, 18.0)))) // Convert to wei
 
@@ -116,7 +116,7 @@ func main() {
 	one := big.NewInt(1) // Init big int of 1
 
 	// Init some vars
-	var contributedAmount *big.Int
+	contributedAmount := big.NewInt(0)
 	var data []byte
 
 	// Start forming the tx
@@ -231,13 +231,18 @@ func main() {
 				return
 			}
 
-			// Instead of doing everything in the if statement, return if a condition is not met
-			// Start with easiest, this avoids unnecessary computations
-			// This should help with speed or CPU load
-			if pendingTx.To() != presaleAddressPointer { // Check if the target address is the presale contract
+			pendingTxTo := pendingTx.To()
+
+			if pendingTxTo == nil {
 				return
 			}
 
+			// Instead of doing everything in the if statement, return if a condition is not met
+			// Start with easiest, this avoids unnecessary computations
+			// This should help with speed or CPU load
+			if pendingTxTo.String() != presaleAddressString { // Check if the target address is the presale contract
+				return
+			}
 			if pendingTx.Value().Cmp(bigStorage.minBuy) == -1 && pendingTx.Value().Cmp(bigStorage.maxBuy) == 1 { // Check if value is between the min and max buy
 				return
 			}
