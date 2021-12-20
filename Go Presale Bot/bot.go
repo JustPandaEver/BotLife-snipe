@@ -50,6 +50,7 @@ var presaleAddress common.Address
 
 func main() {
 	/*---------- Initialize -----------*/
+	fmt.Println("Retrieving config...")
 	f, err := os.Open("./config.yml") // Open the config file
 	if err != nil {
 		log.Fatal(err)
@@ -61,7 +62,9 @@ func main() {
 		log.Fatal(err)
 	}
 	f.Close()
+	fmt.Println("Done!")
 
+	fmt.Println("Connecting to node...")
 	client, err = ethclient.Dial(cfg.Parameters.Host) // Connect to node
 	if err != nil {
 		log.Fatal(err)
@@ -73,6 +76,7 @@ func main() {
 	}
 
 	gethClient := gethclient.New(rpcClient) // Initialize the GETH client
+	fmt.Println("Connected!")
 
 	privateKey, err := crypto.HexToECDSA(cfg.Parameters.PrivateKey) // Load the private key
 	if err != nil {
@@ -154,12 +158,15 @@ func main() {
 
 	// Set the hex locations to use and set data of the transaction
 	if cfg.Parameters.Action == "pinksale" {
+		fmt.Println("Platform: PinkSale")
 		storageHexVals = pinkSale
 		tx.Data = common.Hex2Bytes("0x")
 	} else if cfg.Parameters.Action == "dxSale" {
+		fmt.Println("Platform: dxSale")
 		storageHexVals = dxSale
 		tx.Data = common.Hex2Bytes("0x")
 	} else if cfg.Parameters.Action == "unicrypt" {
+		fmt.Println("Platform: Unicrypt")
 		storageHexVals = unicrypt
 		tx.Data = common.Hex2Bytes("0xf868e7660000000000000000000000000000000000000000000000000000000000000000")
 	} else {
@@ -177,13 +184,16 @@ func main() {
 	/*----------------------------------------*/
 
 	/*-----------Get Data-------------*/
+	fmt.Println("Getting contract data...")
 	bigStorage := formatStorage(storageHexVals) // Retrieve all data from the presale contract
+	fmt.Println("Contract data retrieved!")
 	/*--------------------------------*/
 
 	pTmp := big.NewInt(1).Mul(bigStorage.hardCap, big.NewInt(cfg.Parameters.PercentFill))
 	buyAt := big.NewInt(1).Div(pTmp, big.NewInt(100)) // Set the value to submit transaction at
 
 	/*-----------------Wait------------*/
+	fmt.Println("Waiting for presale to start...")
 	if cfg.Parameters.Action == "pinksale" || cfg.Parameters.Action == "dxSale" {
 		go func() { // Create a goroutine so the sleep is non blocking
 			for bigStorage.startTime.Int64()-unix() > 4 {
@@ -207,6 +217,7 @@ func main() {
 		for bigStorage.startBlock.Uint64()-curBlock > 2 { // Block until # blocks before presale start
 		}
 	}
+	fmt.Println("Presale started... Searching the mempool")
 	/*---------------------------------------*/
 	// Code after this is time-sensitive
 	/*-----------Analyze and Buy-------------*/
@@ -250,7 +261,7 @@ func main() {
 			if err != nil {
 				log.Fatal(err)
 			}
-
+			fmt.Printf("Transaction hash: https://bscscan.com/tx/%v", signedTx.Hash())
 			os.Exit(0) // Exit the program
 
 		}()
