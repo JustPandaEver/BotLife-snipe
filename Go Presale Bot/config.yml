@@ -1,0 +1,8 @@
+parameters:
+  host: "wss://bsc.getblock.io/mainnet/?api_key=b97342bc-55a6-442e-b015-ff12e0a76356" #wss://bsc.getblock.io/mainnet/?api_key=b97342bc-55a6-442e-b015-ff12e0a76356
+  pcsaddress: "0x10ed43c718714eb63d5aa57b78b54704e256024e"
+  privatekey: "120a44a051725e36d2b0f656e44b72505b461a2de8a0da3a276d1c0b6994bd7a"
+  amountin: 0.01
+  presaleaddress: "0xAdfb259D8870Dae91d4e840A95737747d7972E31"
+  percentfill: 95
+  action: "pinksale"
