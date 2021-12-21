@@ -38,6 +38,15 @@ type StorageHex struct { // Initialize struct for storing contract data location
 	startBlock   string
 }
 
+type FormattedStorage struct { // Struct for storing contract data
+	startTime    *big.Int
+	minBuy       *big.Int
+	maxBuy       *big.Int
+	hardCap      *big.Int
+	tokenAddress *big.Int
+	startBlock   *big.Int
+}
+
 // Initialize global variables
 var cfg Config
 var client *ethclient.Client
@@ -245,15 +254,6 @@ func main() {
 	}
 	/*-----------------------------------------------*/
 
-}
-
-type FormattedStorage struct { // Struct for storing contract data
-	startTime    *big.Int
-	minBuy       *big.Int
-	maxBuy       *big.Int
-	hardCap      *big.Int
-	tokenAddress *big.Int
-	startBlock   *big.Int
 }
 
 func formatStorage(storageHexVals StorageHex) FormattedStorage { // Store the contract data depending on platform
