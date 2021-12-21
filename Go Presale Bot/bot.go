@@ -2,12 +2,11 @@ package main
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"encoding/hex"
 	"fmt"
 	"log"
-	"math"
 	"math/big"
+	"modules/transactions"
 	"os"
 	"strings"
 	"time"
@@ -15,7 +14,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/ethclient/gethclient"
 	"github.com/ethereum/go-ethereum/rpc"
@@ -77,29 +75,15 @@ func main() {
 	gethClient := gethclient.New(rpcClient) // Initialize the GETH client
 	fmt.Println("Connected!")
 
-	privateKey, err := crypto.HexToECDSA(cfg.Parameters.PrivateKey) // Load the private key
-	if err != nil {
-		log.Fatal(err)
-	}
+	privateKey, _, fromAddress := transactions.PrivateKeyExtrapolate(cfg.Parameters.PrivateKey)
 	/*------------------------*/
-
-	/*--------Initialize Key----------*/
-	publicKey := privateKey.Public() // Get the public key from private key
-
-	publicKeyECDSA, ok := publicKey.(*ecdsa.PublicKey)
-	if !ok {
-		log.Fatal("error casting public key to ECDSA")
-	}
-	/*---------------------------------*/
 
 	/*----------Initialize Transaction------------*/
 	presaleAddress = common.HexToAddress(cfg.Parameters.PresaleAddress) // Init presale address
 	presaleAddressPointer := &presaleAddress                            // Create a pointer type
 	presaleAddressString := presaleAddressPointer.String()              // Create string of presale address
 
-	value := big.NewInt(int64(cfg.Parameters.AmountIn * (math.Pow(10.0, 18.0)))) // Convert to wei
-
-	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA) // Get the wallet address from public key
+	value := transactions.ToWei(cfg.Parameters.AmountIn) // Convert to wei
 
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress) // Get next available nonce
 	if err != nil {
@@ -199,22 +183,22 @@ func main() {
 	fmt.Println("Waiting for presale to start...")
 	if cfg.Parameters.Action == "pinksale" || cfg.Parameters.Action == "dxSale" {
 		go func() { // Create a goroutine so the sleep is non blocking
-			for bigStorage.startTime.Int64()-unix() > 4 {
-				fmt.Printf("%v Seconds remaining\n", bigStorage.startTime.Int64()-unix())
+			for bigStorage.startTime.Int64()-transactions.Unix() > 4 {
+				fmt.Printf("%v Seconds remaining\n", bigStorage.startTime.Int64()-transactions.Unix())
 				time.Sleep(time.Second)
 			}
 		}()
-		for bigStorage.startTime.Int64()-unix() > 4 { // Block until # seconds before presale start
+		for bigStorage.startTime.Int64()-transactions.Unix() > 4 { // Block until # seconds before presale start
 		}
 	} else if cfg.Parameters.Action == "unicrypt" {
 
 		go func() {
-			for big.NewInt(0).Sub(bigStorage.startBlock, curBlock()).Cmp(big.NewInt(2)) == 1 {
-				fmt.Printf("%v Blocks remaining\n", big.NewInt(0).Sub(bigStorage.startBlock, curBlock()))
+			for big.NewInt(0).Sub(bigStorage.startBlock, transactions.CurrentBlock(context.Background(), client)).Cmp(big.NewInt(2)) == 1 {
+				fmt.Printf("%v Blocks remaining\n", big.NewInt(0).Sub(bigStorage.startBlock, transactions.CurrentBlock(context.Background(), client)))
 				time.Sleep(time.Second * 3)
 			}
 		}()
-		for big.NewInt(0).Sub(bigStorage.startBlock, curBlock()).Cmp(big.NewInt(2)) == 1 { // Block until # blocks before presale start
+		for big.NewInt(0).Sub(bigStorage.startBlock, transactions.CurrentBlock(context.Background(), client)).Cmp(big.NewInt(2)) == 1 { // Block until # blocks before presale start
 		}
 	}
 	fmt.Println("Presale started... Searching the mempool")
@@ -255,18 +239,8 @@ func main() {
 
 			tx.Gas = pendingTx.Gas()                                   // Set gas limit
 			tx.GasPrice = one.Add(pendingTx.GasPrice(), big.NewInt(1)) // Be right in front of the target transaction
-			newTx := types.NewTx(tx)                                   // Create the transaction
 
-			signedTx, err := types.SignTx(newTx, signer, privateKey) // Sign the transaction
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			err = client.SendTransaction(context.Background(), signedTx) // Send the transaction
-			if err != nil {
-				log.Fatal(err)
-			}
-			fmt.Printf("Transaction hash: https://bscscan.com/tx/%v", signedTx.Hash())
+			fmt.Printf("Transaction hash: https://bscscan.com/tx/%v", transactions.SignAndSendLegacyTx(context.Background(), tx, client, signer, privateKey))
 			os.Exit(0) // Exit the program
 
 		}()
@@ -321,16 +295,4 @@ func storages(hexA string) *big.Int { // Retrieve the contract data
 	}
 
 	return big
-}
-
-func unix() int64 { // Get the current epoch time in seconds
-	return time.Now().Unix()
-}
-
-func curBlock() *big.Int { // Get current block
-	currentBlock, err := client.BlockNumber(context.Background())
-	if err != nil {
-		log.Fatal(err)
-	}
-	return big.NewInt(int64(currentBlock))
 }
