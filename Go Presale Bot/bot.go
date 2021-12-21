@@ -21,14 +21,12 @@ import (
 )
 
 type Config struct { // Initialize struct for config options
-	Parameters struct {
-		Host           string  `yaml:"host"`
-		PrivateKey     string  `yaml:"privatekey"`
-		AmountIn       float64 `yaml:"amountin"`
-		PresaleAddress string  `yaml:"presaleaddress"`
-		PercentFill    int64   `yaml:"percentfill"`
-		Action         string  `yaml:"action"`
-	} `yaml:"parameters"`
+	Host           string  `yaml:"host"`
+	PrivateKey     string  `yaml:"privatekey"`
+	AmountIn       float64 `yaml:"amountin"`
+	PresaleAddress string  `yaml:"presaleaddress"`
+	PercentFill    int64   `yaml:"percentfill"`
+	Action         string  `yaml:"action"`
 }
 
 type StorageHex struct { // Initialize struct for storing contract data locations in hex
@@ -62,12 +60,12 @@ func main() {
 	fmt.Println("Done!")
 
 	fmt.Println("Connecting to node...")
-	client, err = ethclient.Dial(cfg.Parameters.Host) // Connect to node
+	client, err = ethclient.Dial(cfg.Host) // Connect to node
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	rpcClient, err := rpc.DialContext(context.Background(), cfg.Parameters.Host) // Connect to node for RPC
+	rpcClient, err := rpc.DialContext(context.Background(), cfg.Host) // Connect to node for RPC
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,15 +73,15 @@ func main() {
 	gethClient := gethclient.New(rpcClient) // Initialize the GETH client
 	fmt.Println("Connected!")
 
-	privateKey, _, fromAddress := transactions.PrivateKeyExtrapolate(cfg.Parameters.PrivateKey)
+	privateKey, _, fromAddress := transactions.PrivateKeyExtrapolate(cfg.PrivateKey)
 	/*------------------------*/
 
 	/*----------Initialize Transaction------------*/
-	presaleAddress = common.HexToAddress(cfg.Parameters.PresaleAddress) // Init presale address
-	presaleAddressPointer := &presaleAddress                            // Create a pointer type
-	presaleAddressString := presaleAddressPointer.String()              // Create string of presale address
+	presaleAddress = common.HexToAddress(cfg.PresaleAddress) // Init presale address
+	presaleAddressPointer := &presaleAddress                 // Create a pointer type
+	presaleAddressString := presaleAddressPointer.String()   // Create string of presale address
 
-	value := transactions.ToWei(cfg.Parameters.AmountIn) // Convert to wei
+	value := transactions.ToWei(cfg.AmountIn) // Convert to wei
 
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress) // Get next available nonce
 	if err != nil {
@@ -141,15 +139,15 @@ func main() {
 	var storageHexVals StorageHex
 
 	// Set the hex locations to use and set data of the transaction
-	if cfg.Parameters.Action == "pinksale" {
+	if cfg.Action == "pinksale" {
 		fmt.Println("Platform: PinkSale")
 		storageHexVals = pinkSale
 		tx.Data = common.Hex2Bytes("0x")
-	} else if cfg.Parameters.Action == "dxSale" {
+	} else if cfg.Action == "dxSale" {
 		fmt.Println("Platform: dxSale")
 		storageHexVals = dxSale
 		tx.Data = common.Hex2Bytes("0x")
-	} else if cfg.Parameters.Action == "unicrypt" {
+	} else if cfg.Action == "unicrypt" {
 		fmt.Println("Platform: Unicrypt")
 		storageHexVals = unicrypt
 		tx.Data, err = hexutil.Decode("0xf868e7660000000000000000000000000000000000000000000000000000000000000000")
@@ -157,7 +155,7 @@ func main() {
 			log.Fatal(err)
 		}
 	} else {
-		log.Fatalf("Unsupported action: %v", cfg.Parameters.Action)
+		log.Fatalf("Unsupported action: %v", cfg.Action)
 	}
 	/*-------------------------------------*/
 
@@ -176,12 +174,12 @@ func main() {
 	fmt.Println("Contract data retrieved!")
 	/*--------------------------------*/
 
-	pTmp := big.NewInt(1).Mul(bigStorage.hardCap, big.NewInt(cfg.Parameters.PercentFill))
+	pTmp := big.NewInt(1).Mul(bigStorage.hardCap, big.NewInt(cfg.PercentFill))
 	buyAt := big.NewInt(1).Div(pTmp, big.NewInt(100)) // Set the value to submit transaction at
 
 	/*-----------------Wait------------*/
 	fmt.Println("Waiting for presale to start...")
-	if cfg.Parameters.Action == "pinksale" || cfg.Parameters.Action == "dxSale" {
+	if cfg.Action == "pinksale" || cfg.Action == "dxSale" {
 		go func() { // Create a goroutine so the sleep is non blocking
 			for bigStorage.startTime.Int64()-transactions.Unix() > 4 {
 				fmt.Printf("%v Seconds remaining\n", bigStorage.startTime.Int64()-transactions.Unix())
@@ -190,7 +188,7 @@ func main() {
 		}()
 		for bigStorage.startTime.Int64()-transactions.Unix() > 4 { // Block until # seconds before presale start
 		}
-	} else if cfg.Parameters.Action == "unicrypt" {
+	} else if cfg.Action == "unicrypt" {
 
 		go func() {
 			for big.NewInt(0).Sub(bigStorage.startBlock, transactions.CurrentBlock(context.Background(), client)).Cmp(big.NewInt(2)) == 1 {
@@ -259,7 +257,7 @@ type FormattedStorage struct { // Struct for storing contract data
 }
 
 func formatStorage(storageHexVals StorageHex) FormattedStorage { // Store the contract data depending on platform
-	if cfg.Parameters.Action == "unicrypt" {
+	if cfg.Action == "unicrypt" {
 		data := FormattedStorage{
 			minBuy:       big.NewInt(1),
 			maxBuy:       storages(storageHexVals.maxBuy),
