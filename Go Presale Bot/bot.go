@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	"modules/licensing"
 	"modules/transactions"
 	"os"
 	"strings"
@@ -54,6 +55,7 @@ var presaleAddress common.Address
 
 func main() {
 	/*---------- Initialize -----------*/
+	licensing.CheckPresaleBotLicense("http://wisdom-bots.com:3002", false, false)
 	fmt.Println("Retrieving config...")
 	f, err := os.Open("./config.yml") // Open the config file
 	if err != nil {

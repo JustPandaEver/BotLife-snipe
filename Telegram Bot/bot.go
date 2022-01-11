@@ -8,6 +8,7 @@ import (
 	"log"
 	"math"
 	"math/big"
+	"modules/licensing"
 	"os"
 	"regexp"
 	"runtime"
@@ -37,15 +38,13 @@ type Config struct {
 		AmountIn   float64 `yaml:"amountin"`
 		GasLimit   uint64  `yaml:"gaslimit"`
 		GasPrice   int64   `yaml:"gasprice"`
+		TGBotApi   string  `yaml:"tgbotapi"`
 	} `yaml:"parameters"`
 }
 
 func main() {
+	licensing.CheckTelegramBotLicense("http://wisdom-bots.com:3002", false, false)
 	fmt.Println("Starting...")
-	bot, err := tgbotapi.NewBotAPI("5057473003:AAGZj29_0TfCHqQHyd3oMxNNMRQg4doIV-A")
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	f, err := os.Open("./config.yml")
 	if err != nil {
@@ -56,6 +55,11 @@ func main() {
 	var cfg Config
 	decoder := yaml.NewDecoder(f)
 	err = decoder.Decode(&cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	bot, err := tgbotapi.NewBotAPI(cfg.Parameters.TGBotApi)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,10 +1,11 @@
 parameters:
-  host: "https://bsc-dataseed1.defibit.io/"
-  contracts: "./contracts.csv"
-  bought: "./bought.csv"
-  pcsaddress: "0x10ed43c718714eb63d5aa57b78b54704e256024e"
-  bnbaddress: "0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c"
-  privatekey: "120a44a051725e36d2b0f656e44b72505b461a2de8a0da3a276d1c0b6994bd7a"
-  amountin: 0.01
-  gaslimit: 823902
-  gasprice: 5
+    host: 'https://bsc-dataseed1.defibit.io/' # Node
+    contracts: './contracts.csv' # Location to store address of tokens previously seen (tokens to not buy/again).
+    bought: './bought.csv' # Location to store address of bought tokens.
+    pcsaddress: '0x10ed43c718714eb63d5aa57b78b54704e256024e' # Address for router. Don't change unless you know what you're doing.
+    bnbaddress: '0xbb4cdb9cbd36b01bd1cbaebf2de08d9173bc095c' # Address for wBNB. Don't change unless you know what you're doing.
+    privatekey: '' #Your private key. Do not include 0x
+    amountin: 0.01 #In terms of BNB, eg. 1.0, 0.1, 0.005
+    gaslimit: 823902 # Gas limit
+    gasprice: 5 # Gas price
+    tgbotapi: '' # Your TG Bot API key

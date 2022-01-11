@@ -2,10 +2,13 @@ module tgbot
 
 go 1.17
 
+replace modules/licensing => ../modules/licensing
+
 require (
 	github.com/ethereum/go-ethereum v1.10.13
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.5.1
 	gopkg.in/yaml.v2 v2.4.0
+	modules/licensing v0.0.0-00010101000000-000000000000
 )
 
 require (
