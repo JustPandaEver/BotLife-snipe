@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
 	"modules/licensing"
 	"modules/transactions"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
+	"github.com/chromedp/cdproto/emulation"
+	"github.com/chromedp/chromedp"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -30,22 +32,12 @@ type Config struct { // Initialize struct for config options
 	Action         string  `yaml:"action"`
 }
 
-type StorageHex struct { // Initialize struct for storing contract data locations in hex
-	startTime    string
-	minBuy       string
-	maxBuy       string
-	hardCap      string
-	tokenAddress string
-	startBlock   string
-}
-
 type FormattedStorage struct { // Struct for storing contract data
-	startTime    *big.Int
-	minBuy       *big.Int
-	maxBuy       *big.Int
-	hardCap      *big.Int
-	tokenAddress *big.Int
-	startBlock   *big.Int
+	startTime  int64
+	minBuy     *big.Int
+	maxBuy     *big.Int
+	hardCap    *big.Int
+	startBlock *big.Int
 }
 
 // Initialize global variables
@@ -121,46 +113,14 @@ func main() {
 	}
 	/*---------------------------------------------*/
 
-	/*------------------Storage Addresses----------*/
-	pinkSale := StorageHex{ // Set the hex of storage address for the platforms
-		startTime:    "0x6A",
-		minBuy:       "0x82",
-		maxBuy:       "0x83",
-		hardCap:      "0x85",
-		tokenAddress: "0x69",
-	}
-
-	dxSale := StorageHex{
-		startTime:    "0x2D",
-		minBuy:       "0x1A",
-		maxBuy:       "0x1B",
-		hardCap:      "0x2C",
-		tokenAddress: "0x0",
-	}
-
-	unicrypt := StorageHex{
-		maxBuy:       "0x5",
-		hardCap:      "0x7",
-		tokenAddress: "0x2",
-		startBlock:   "0xB",
-	}
-	/*------------------------------------*/
-
 	/*-----------Select Platform----------*/
-	var storageHexVals StorageHex
 
-	// Set the hex locations to use and set data of the transaction
+	// Set data of the transaction
 	if cfg.Action == "pinksale" {
 		fmt.Println("Platform: PinkSale")
-		storageHexVals = pinkSale
-		tx.Data = common.Hex2Bytes("0x")
-	} else if cfg.Action == "dxSale" {
-		fmt.Println("Platform: dxSale")
-		storageHexVals = dxSale
 		tx.Data = common.Hex2Bytes("0x")
 	} else if cfg.Action == "unicrypt" {
 		fmt.Println("Platform: Unicrypt")
-		storageHexVals = unicrypt
 		tx.Data, err = hexutil.Decode("0xf868e7660000000000000000000000000000000000000000000000000000000000000000")
 		if err != nil {
 			log.Fatal(err)
@@ -181,7 +141,7 @@ func main() {
 
 	/*-----------Get Data-------------*/
 	fmt.Println("Getting contract data...")
-	bigStorage := formatStorage(storageHexVals) // Retrieve all data from the presale contract
+	bigStorage := getData() // Retrieve all data from the presale contract
 	fmt.Println("Contract data retrieved!")
 	/*--------------------------------*/
 
@@ -192,12 +152,12 @@ func main() {
 	fmt.Println("Waiting for presale to start...")
 	if cfg.Action == "pinksale" || cfg.Action == "dxSale" {
 		go func() { // Create a goroutine so the sleep is non blocking
-			for bigStorage.startTime.Int64()-transactions.Unix() > 4 {
-				fmt.Printf("%v Seconds remaining\n", bigStorage.startTime.Int64()-transactions.Unix())
+			for bigStorage.startTime-transactions.Unix() > 4 {
+				fmt.Printf("%v Seconds remaining\n", bigStorage.startTime-transactions.Unix())
 				time.Sleep(time.Second)
 			}
 		}()
-		for bigStorage.startTime.Int64()-transactions.Unix() > 4 { // Block until # seconds before presale start
+		for bigStorage.startTime-transactions.Unix() > 4 { // Block until # seconds before presale start
 		}
 	} else if cfg.Action == "unicrypt" {
 
@@ -258,41 +218,113 @@ func main() {
 
 }
 
-func formatStorage(storageHexVals StorageHex) FormattedStorage { // Store the contract data depending on platform
-	if cfg.Action == "unicrypt" {
-		data := FormattedStorage{
-			minBuy:       big.NewInt(1),
-			maxBuy:       storages(storageHexVals.maxBuy),
-			hardCap:      storages(storageHexVals.hardCap),
-			tokenAddress: storages(storageHexVals.tokenAddress),
-			startBlock:   storages(storageHexVals.startBlock),
+var data FormattedStorage
+
+func getData() FormattedStorage {
+	// create chrome instance
+	ctx, cancel := chromedp.NewContext(
+		context.Background(),
+		chromedp.WithLogf(log.Printf),
+	)
+	defer cancel()
+
+	// create a timeout
+	ctx, cancel = context.WithTimeout(ctx, 10*time.Second)
+	defer cancel()
+	// navigate to a page, wait for an element, click
+	if cfg.Action == "pinksale" {
+		var start string
+		var cap string
+		var min string
+		var max string
+		err := chromedp.Run(ctx,
+			emulation.SetUserAgentOverride("WebScraper 1.0"),
+			chromedp.Navigate("https://www.pinksale.finance/#/launchpad/"+cfg.PresaleAddress+"?chain=BSC"),
+			// wait for footer element is visible (ie, page is loaded)
+			chromedp.ScrollIntoView(`footer`),
+			chromedp.WaitVisible(`div.ant-card-body > div.ant-alert`, chromedp.ByQuery),
+			chromedp.Text(`//tr[contains(., 'Presale Start Time')]/td[2]`, &start, chromedp.NodeVisible, chromedp.BySearch),
+			chromedp.Text(`//tr[contains(., 'Hard Cap')]/td[2]`, &cap, chromedp.NodeVisible, chromedp.BySearch),
+			chromedp.Text(`//tr[contains(., 'Minimum Buy')]/td[2]`, &min, chromedp.NodeVisible, chromedp.BySearch),
+			chromedp.Text(`//tr[contains(., 'Maximum Buy')]/td[2]`, &max, chromedp.NodeVisible, chromedp.BySearch),
+		)
+		if err != nil {
+			log.Fatal(err)
 		}
-		return data
+		start = strings.TrimRight(start, "(UTC) ")
+		t, err := time.Parse("2006.01.02 15:04", start)
+		if err != nil {
+			panic(err)
+		}
+		cap = strings.TrimRight(cap, " BN")
+		min = strings.TrimRight(min, " BN")
+		max = strings.TrimRight(max, " BN")
+
+		cap64, err := strconv.ParseFloat(cap, 64)
+		if err != nil {
+			panic(err)
+		}
+
+		min64, err := strconv.ParseFloat(min, 64)
+		if err != nil {
+			panic(err)
+		}
+
+		max64, err := strconv.ParseFloat(max, 64)
+		if err != nil {
+			panic(err)
+		}
+		data = FormattedStorage{
+			startTime: t.Unix(),
+			minBuy:    transactions.ToWei(min64),
+			maxBuy:    transactions.ToWei(max64),
+			hardCap:   transactions.ToWei(cap64),
+		}
 	} else {
-		data := FormattedStorage{
-			startTime:    storages(storageHexVals.startTime),
-			minBuy:       storages(storageHexVals.minBuy),
-			maxBuy:       storages(storageHexVals.maxBuy),
-			hardCap:      storages(storageHexVals.hardCap),
-			tokenAddress: storages(storageHexVals.tokenAddress),
+		var start string
+		var cap string
+		var max string
+		err := chromedp.Run(ctx,
+			emulation.SetUserAgentOverride("WebScraper 1.0"),
+			chromedp.Navigate("https://app.unicrypt.network/amm/pancake-v2/ilo/"+cfg.PresaleAddress),
+			// wait for footer element is visible (ie, page is loaded)
+			chromedp.ScrollIntoView(`footer`),
+			chromedp.WaitVisible(`div.v-tabs`, chromedp.ByQuery),
+			chromedp.EvaluateAsDevTools(`$x("/html/body/div/div[1]/main/div/div[2]/div/div[2]/div[2]/div[3]/div[2]/div[3]/div[1]/div/div[2]/div/div[3]")[0].click()`, nil),
+
+			chromedp.Text(`/html/body/div/div[1]/main/div/div[2]/div/div[2]/div[2]/div[3]/div[2]/div[3]/div[2]/div[2]/div/div[1]/div[3]/div[1]`, &start, chromedp.NodeVisible, chromedp.BySearch),
+			chromedp.Text(`/html/body/div/div[1]/main/div/div[2]/div/div[2]/div[2]/div[3]/div[2]/div[3]/div[2]/div[2]/div/div[4]/div/div[1]`, &cap, chromedp.NodeVisible, chromedp.BySearch),
+			chromedp.Text(`/html/body/div/div[1]/main/div/div[2]/div/div[2]/div[2]/div[3]/div[2]/div[3]/div[2]/div[2]/div/div[5]/div/div[1]`, &max, chromedp.NodeVisible, chromedp.BySearch),
+		)
+		if err != nil {
+			log.Fatal(err)
 		}
-		return data
+
+		parts := strings.Split(start, " ")
+		start = parts[2]
+		cap = strings.TrimRight(cap, " BN")
+		max = strings.TrimRight(max, " BN")
+
+		cap64, err := strconv.ParseFloat(cap, 64)
+		if err != nil {
+			panic(err)
+		}
+
+		max64, err := strconv.ParseFloat(max, 64)
+		if err != nil {
+			panic(err)
+		}
+
+		startInt, err := strconv.ParseInt(start, 10, 64)
+		if err != nil {
+			panic(err)
+		}
+
+		data = FormattedStorage{
+			startBlock: big.NewInt(startInt),
+			maxBuy:     transactions.ToWei(max64),
+			hardCap:    transactions.ToWei(cap64),
+		}
 	}
-}
-
-func storages(hexA string) *big.Int { // Retrieve the contract data
-	val, err := client.StorageAt(context.Background(), presaleAddress, common.HexToHash(hexA), nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	data := "0x" + strings.TrimLeft(hex.EncodeToString(val), "0") // Convert from bytes to hex and trim leading zeroes
-
-	big, err := hexutil.DecodeBig(data) // Convert hex data to a big int
-	if err != nil {
-		fmt.Println(hexA)
-		log.Fatal(err)
-	}
-
-	return big
+	return data
 }
