@@ -1,5 +1,5 @@
 host: '' # Address of node, WSS or IPC
-privatekey: '120a44a051725e36d2b0f656e44b72505b461a2de8a0da3a276d1c0b6994bd7a' # Private key of wallet to buy with. Do not include 0x
+privatekey: '' # Private key of wallet to buy with. Do not include 0x
 amountin: 0.001 # Amount to buy with in terms of BNB; 0.5, 1.0, 0.001, etc.
 presaleaddress: '0x' # Address of the presale, not token address!
 percentfill: 10 # When the presale is this full, buy. Tune to your liking. Unit is %
