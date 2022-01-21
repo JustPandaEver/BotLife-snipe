@@ -48,6 +48,7 @@ func main() {
 
 	f, err := os.Open("./config.yml")
 	if err != nil {
+		fmt.Println("Unable to open config. Make sure it is present.")
 		log.Fatal(err)
 	}
 	defer f.Close()
@@ -56,11 +57,13 @@ func main() {
 	decoder := yaml.NewDecoder(f)
 	err = decoder.Decode(&cfg)
 	if err != nil {
+		fmt.Println("Error reading config. Please make sure it is formatted correctly.")
 		log.Fatal(err)
 	}
 
 	bot, err := tgbotapi.NewBotAPI(cfg.Parameters.TGBotApi)
 	if err != nil {
+		fmt.Println("Unable to connect to Telegram bot.")
 		log.Fatal(err)
 	}
 
@@ -111,9 +114,10 @@ func getContract(update tgbotapi.Update) string {
 	return contract
 }
 
-func buy(contract string, cfg Config) bool {
+func buy(contract string, cfg Config) {
 	client, err := ethclient.Dial(cfg.Parameters.Host)
 	if err != nil {
+		fmt.Println("Error connecting to node.")
 		log.Fatal(err)
 	}
 
@@ -122,11 +126,13 @@ func buy(contract string, cfg Config) bool {
 	bnbAddress := common.HexToAddress(cfg.Parameters.BNBAddress)
 	privateKey, err := crypto.HexToECDSA(cfg.Parameters.PrivateKey)
 	if err != nil {
+		fmt.Println("Private key error. Please make sure it is entered correctly")
 		log.Fatal(err)
 	}
 
 	chainID, err := client.NetworkID(context.Background())
 	if err != nil {
+		fmt.Println("Unable to obtain ChainID.")
 		log.Fatal(err)
 	}
 	auth, _ := bind.NewKeyedTransactorWithChainID(privateKey, (*big.Int)(chainID))
@@ -142,6 +148,7 @@ func buy(contract string, cfg Config) bool {
 	fromAddress := crypto.PubkeyToAddress(*publicKeyECDSA)
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress)
 	if err != nil {
+		fmt.Println("Unable to retrieve pending nonce.")
 		log.Fatal(err)
 	}
 	txNonce := big.NewInt(int64(nonce))
@@ -159,6 +166,7 @@ func buy(contract string, cfg Config) bool {
 	path := []common.Address{bnbAddress, contractAddress}
 	out, err := instance.GetAmountsOut(opts, amountIn, path)
 	if err != nil {
+		fmt.Println("Unable to determine amount out.")
 		log.Fatal(err)
 	}
 	minAmtOut := out[1].Mul(out[1], big.NewInt(85)).Div(out[1], big.NewInt(100))
@@ -174,13 +182,15 @@ func buy(contract string, cfg Config) bool {
 	deadline := big.NewInt(time.Now().Unix() + 1200)
 	tx, err := instance.SwapExactETHForTokensSupportingFeeOnTransferTokens(transactOps, minAmtOut, path, fromAddress, deadline)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("Transaction failed.\n%q", err)
 	}
-	fmt.Printf("Transaction receipt: %v", tx.Hash())
-	f, _ := os.OpenFile(cfg.Parameters.Bought, os.O_RDWR, 0777)
-	writer := csv.NewWriter(f)
-	writer.Write([]string{fmt.Sprintf("Transaction receipt: %v", tx.Hash())})
-	writer.Flush()
-	f.Close()
-	return true
+	if err == nil {
+		fmt.Printf("Transaction receipt: %v", tx.Hash())
+		f, _ := os.OpenFile(cfg.Parameters.Bought, os.O_RDWR, 0777)
+		writer := csv.NewWriter(f)
+		writer.Write([]string{fmt.Sprintf("Transaction receipt: %v", tx.Hash())})
+		writer.Flush()
+		f.Close()
+	}
+
 }

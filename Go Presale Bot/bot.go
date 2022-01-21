@@ -51,12 +51,14 @@ func main() {
 	fmt.Println("Retrieving config...")
 	f, err := os.Open("./config.yml") // Open the config file
 	if err != nil {
+		fmt.Println("Ensure config is present.")
 		log.Fatal(err)
 	}
 
 	decoder := yaml.NewDecoder(f) // Create variables from config options
 	err = decoder.Decode(&cfg)
 	if err != nil {
+		fmt.Println("Config file is likely formatted incorrectly.")
 		log.Fatal(err)
 	}
 	f.Close()
@@ -65,11 +67,13 @@ func main() {
 	fmt.Println("Connecting to node...")
 	client, err = ethclient.Dial(cfg.Host) // Connect to node
 	if err != nil {
+		fmt.Println("Unable to connect to node.")
 		log.Fatal(err)
 	}
 
 	rpcClient, err := rpc.DialContext(context.Background(), cfg.Host) // Connect to node for RPC
 	if err != nil {
+		fmt.Println("Unable to connect to node.")
 		log.Fatal(err)
 	}
 
@@ -88,11 +92,13 @@ func main() {
 
 	nonce, err := client.PendingNonceAt(context.Background(), fromAddress) // Get next available nonce
 	if err != nil {
+		fmt.Println("Unable to retrieve nonce.")
 		log.Fatal(err)
 	}
 
 	chainId, err := client.ChainID(context.Background()) // Get current ChainID
 	if err != nil {
+		fmt.Println("Unable to retrieve ChainID.")
 		log.Fatal(err)
 	}
 
@@ -118,7 +124,7 @@ func main() {
 	// Set data of the transaction
 	if cfg.Action == "pinksale" {
 		fmt.Println("Platform: PinkSale")
-		tx.Data = common.Hex2Bytes("0x")
+		tx.Data = common.Hex2Bytes("0xd7bb99ba")
 	} else if cfg.Action == "unicrypt" {
 		fmt.Println("Platform: Unicrypt")
 		tx.Data, err = hexutil.Decode("0xf868e7660000000000000000000000000000000000000000000000000000000000000000")
@@ -135,6 +141,7 @@ func main() {
 
 	_, err = gethClient.SubscribePendingTransactions(context.Background(), hashes) // Subscribe to the TxPool over WS
 	if err != nil {
+		fmt.Println("Unable to subscribe to the mempool. Ensure your node supports txpool.")
 		log.Fatal(err)
 	}
 	/*----------------------------------------*/
@@ -152,7 +159,7 @@ func main() {
 	fmt.Println("Waiting for presale to start...")
 	if cfg.Action == "pinksale" || cfg.Action == "dxSale" {
 		go func() { // Create a goroutine so the sleep is non blocking
-			for bigStorage.startTime-transactions.Unix() > 4 {
+			for bigStorage.startTime-transactions.Unix() > 3 {
 				fmt.Printf("%v Seconds remaining\n", bigStorage.startTime-transactions.Unix())
 				time.Sleep(time.Second)
 			}
@@ -206,7 +213,7 @@ func main() {
 				return
 			}
 
-			tx.Gas = pendingTx.Gas()                                   // Set gas limit
+			tx.Gas = pendingTx.Gas() * 2                               // Set gas limit
 			tx.GasPrice = one.Add(pendingTx.GasPrice(), big.NewInt(1)) // Be right in front of the target transaction
 
 			fmt.Printf("Transaction hash: https://bscscan.com/tx/%v", transactions.SignAndSendLegacyTx(context.Background(), tx, client, signer, privateKey))
@@ -249,6 +256,7 @@ func getData() FormattedStorage {
 			chromedp.Text(`//tr[contains(., 'Maximum Buy')]/td[2]`, &max, chromedp.NodeVisible, chromedp.BySearch),
 		)
 		if err != nil {
+			fmt.Println("Unable to retrieve contract information. Please make sure the contract address and action are entered correctly. Then run the bot again. Sometimes this error can happen multiple times in a row.")
 			log.Fatal(err)
 		}
 		start = strings.TrimRight(start, "(UTC) ")
@@ -297,6 +305,7 @@ func getData() FormattedStorage {
 			chromedp.Text(`/html/body/div/div[1]/main/div/div[2]/div/div[2]/div[2]/div[3]/div[2]/div[3]/div[2]/div[2]/div/div[5]/div/div[1]`, &max, chromedp.NodeVisible, chromedp.BySearch),
 		)
 		if err != nil {
+			fmt.Println("Unable to retrieve contract information. Please make sure the contract address and action are entered correctly. Then run the bot again. Sometimes this error can happen multiple times in a row.")
 			log.Fatal(err)
 		}
 
