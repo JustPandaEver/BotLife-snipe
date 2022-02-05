@@ -13,6 +13,8 @@ import (
 
 	erc20 "BotLife/AntirugBot/erc20"
 	pcsRouter "BotLife/AntirugBot/pcsrouter"
+	"net/http"
+	_ "net/http/pprof"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -31,10 +33,6 @@ type Config struct { // Initialize struct for config options
 	BnbAddress string `yaml:"bnbAddress"`
 }
 
-type Client struct {
-	c *rpc.Client
-}
-
 var cfg Config
 var client *ethclient.Client
 var privKey *ecdsa.PrivateKey
@@ -46,6 +44,9 @@ var pcsInstance *pcsRouter.PcsRouter
 var ercInstance *erc20.ERC20Abi
 
 func main() {
+	go func() {
+		http.ListenAndServe("localhost:8080", nil)
+	}()
 
 	f, err := os.Open("./config.yml") // Open the config file
 	if err != nil {
@@ -96,39 +97,44 @@ func main() {
 		fmt.Println("Unable to subscribe to the mempool. Ensure your node supports txpool.")
 		log.Fatal(err)
 	}
-
 	fmt.Println("Go!")
 	for { // Create a new thread for every pending transaction
-		go func() {
-
-			hash := <-hashes // Receive the hash
-
-			pendingTx, _, err := client.TransactionByHash(context.Background(), hash) // Get transaction from hash
-			if err != nil {
-				return
+		select {
+		case hash, ok := <-hashes:
+			if ok {
+				go checkTx(hash)
 			}
+		default:
 
-			pendingTxTo := pendingTx.To()
+		}
+	}
 
-			if pendingTxTo == nil {
-				return
-			}
+}
 
-			if *pendingTx.To() == pcsRouterAddress {
-				if decodeLiquidityInput(pendingTx) {
-					sellCoin(pendingTx)
-				}
-			} else {
-				return
-			}
+func checkTx(hash common.Hash) {
+	fmt.Println(hash)
 
-			if checkRug(pendingTx) {
-				sellCoin(pendingTx)
-			} else {
-				return
-			}
+	pendingTx, _, err := client.TransactionByHash(context.Background(), hash) // Get transaction from hash
+	if err != nil {
+		return
+	}
 
-		}()
+	if pendingTx.To() == nil {
+		return
+	}
+
+	if *pendingTx.To() == pcsRouterAddress {
+		if decodeLiquidityInput(pendingTx) {
+			sellCoin(pendingTx)
+		}
+	} else {
+		return
+	}
+
+	if checkRug(pendingTx) {
+		sellCoin(pendingTx)
+	} else {
+		return
 	}
 
 }
