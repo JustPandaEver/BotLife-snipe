@@ -1,4 +1,50 @@
-# BotLife
+# Cryptocurrency Transaction Handler
+
+A collection of cryptocurrency trading bots to be used on the Binance Smart Chain.
+
+## Table of Contents
+
+- [Features](#features)
+- [Technologies Used](#technologies-used)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Features
+
+### Antirug Bot
+
+- Prevent the trader from being scammed
+
+### Go Presale Bot
+
+- Purchase initial coin drops before anyone else
+
+### Mempool Bot
+
+- Deprecated JavaScript implementation of a presale bot
+
+### Presale Bot
+
+- Another deprecated JavaScript implementation of a presale bot
+
+### Telegram bot
+
+- A bot that can purchase coins showing high interest in a channel on the messaging app Telegram
+
+### Scraper
+
+- A Go web scraper to gather information for the presale bots
+
+## Technologies Used
+
+Cryptocurrency Transaction Handler is built using the following technologies:
+
+- Go: A programming language designed for building fast, efficient, and scalable software
+- GoEthereum: A client implementation of the Ethereum protocol
+
+## Contributing
+
+Contributions to Cryptocurrency Transaction Handler are welcome! If you have any bug reports, feature requests, or other suggestions, please open an issue or submit a pull request.
 
 ---
 
@@ -38,7 +84,7 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
     - [ ] Max transfer
     - [ ] Marketing wallet
 
-#PreSale Bot ToDo
+# PreSale Bot ToDo
 
 - [x] Add approve
 - [x] Support DX
@@ -46,7 +92,3 @@ We will soon have the most powerful bot on the **Binance Smart Chain**. Created 
 - [ ] Add claim
 - [ ] Add sell
 - [ ] Add pinkWhitelist
-
-Cancel transactions that didn't succeed?
-
-Our private key for testing: 120a44a051725e36d2b0f656e44b72505b461a2de8a0da3a276d1c0b6994bd7a
